@@ -112,8 +112,8 @@ export default function DoctorsPage() {
       />
 
       {/* Search & Filter Bar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-4 space-y-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <SearchInput
             value={search}
             onChange={handleSearchChange}
@@ -125,7 +125,7 @@ export default function DoctorsPage() {
             <Button
               variant={showFilters ? "secondary" : "outline"}
               size="sm"
-              className="rounded-xl text-xs h-9"
+              className="rounded-xl text-xs h-9 flex-1 sm:flex-none justify-center"
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="h-3.5 w-3.5 mr-1.5" />
@@ -224,9 +224,9 @@ export default function DoctorsPage() {
                     setStartDate(e.target.value);
                     setPage(1);
                   }}
-                  className="h-10 text-xs px-2"
+                  className="h-10 text-xs px-2 min-w-0 flex-1"
                 />
-                <span className="text-muted-foreground">–</span>
+                <span className="text-muted-foreground shrink-0">–</span>
                 <Input
                   type="date"
                   value={endDate}
@@ -234,7 +234,7 @@ export default function DoctorsPage() {
                     setEndDate(e.target.value);
                     setPage(1);
                   }}
-                  className="h-10 text-xs px-2"
+                  className="h-10 text-xs px-2 min-w-0 flex-1"
                 />
               </div>
             </div>

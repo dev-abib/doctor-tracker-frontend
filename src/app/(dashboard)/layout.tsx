@@ -15,11 +15,11 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-background">
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#f4f7fc] dark:bg-[#090d16]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-xs font-semibold text-muted-foreground animate-pulse">
-            Authenticating Session...
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#5046e5] border-t-transparent" />
+          <p className="text-xs font-semibold text-slate-500 animate-pulse">
+            Connecting Doctor Tracker Portal...
           </p>
         </div>
       </div>
@@ -27,16 +27,17 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="relative min-h-screen w-full bg-[#f4f7fc] dark:bg-[#090d16]">
+      {/* Fixed Viewport Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
-
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
+      {/* Main Content Area offset by Sidebar */}
+      <div className="flex flex-col min-w-0 lg:pl-72 transition-all">
+        <main className="flex-1 px-3 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-12 w-full max-w-[1600px]">
+          <Topbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
           {children}
         </main>
       </div>

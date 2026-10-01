@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
@@ -11,7 +11,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import { ChartCard } from "@/components/shared/ChartCard";
-import { Button } from "@/components/ui/button";
 import { TimeSeriesPoint } from "@/types/api";
 
 interface Props {
@@ -24,23 +23,26 @@ interface Props {
 }
 
 export const PatientsOverTimeChart: React.FC<Props> = ({ data, isLoading }) => {
-  const [timeframe, setTimeframe] = useState<"day" | "week" | "month">("day");
+  const [timeframe, setTimeframe] = useState<"day" | "week" | "month">("month");
 
   const currentData = data ? data[timeframe] || [] : [];
   const isEmpty = !isLoading && currentData.length === 0;
 
   const timeframeAction = (
-    <div className="flex items-center rounded-xl border border-border/80 bg-muted/30 p-0.5">
+    <div className="flex items-center rounded-xl bg-[#eff2fc] dark:bg-slate-800 p-0.5">
       {(["day", "week", "month"] as const).map((t) => (
-        <Button
+        <button
           key={t}
-          variant={timeframe === t ? "default" : "ghost"}
-          size="sm"
+          type="button"
           onClick={() => setTimeframe(t)}
-          className="h-7 rounded-lg px-2.5 text-xs capitalize"
+          className={`h-6 rounded-lg px-2.5 text-[11px] font-semibold capitalize transition-all cursor-pointer ${
+            timeframe === t
+              ? "bg-[#5046e5] text-white shadow-2xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+          }`}
         >
           {t}
-        </Button>
+        </button>
       ))}
     </div>
   );
@@ -48,44 +50,39 @@ export const PatientsOverTimeChart: React.FC<Props> = ({ data, isLoading }) => {
   return (
     <ChartCard
       title="Patient Registrations Over Time"
-      description={`Admission and visit volume by ${timeframe}`}
+      description="Historical admission and consultation volume by selected timeframe"
       action={timeframeAction}
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
-      <div className="h-72 w-full">
+      <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
+          <BarChart
             data={currentData}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
-            <defs>
-              <linearGradient id="patientColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.15} />
+            <CartesianGrid strokeDasharray="0 0" vertical={false} stroke="#f1f5f9" />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               allowDecimals={false}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
+              cursor={{ fill: "rgba(80, 70, 229, 0.05)" }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-xl border border-border bg-card p-3 shadow-xl text-xs">
-                      <p className="font-semibold text-muted-foreground">{item.date}</p>
-                      <p className="mt-1 text-sm font-bold text-primary">
+                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
+                      <p className="font-semibold text-slate-400">{item.date}</p>
+                      <p className="mt-1 text-sm font-bold text-[#5046e5]">
                         {item.count} Patients Registered
                       </p>
                     </div>
@@ -94,15 +91,13 @@ export const PatientsOverTimeChart: React.FC<Props> = ({ data, isLoading }) => {
                 return null;
               }}
             />
-            <Area
-              type="monotone"
+            <Bar
               dataKey="count"
-              stroke="#3b82f6"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#patientColor)"
+              fill="#5046e5"
+              radius={[6, 6, 0, 0]}
+              maxBarSize={32}
             />
-          </AreaChart>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </ChartCard>

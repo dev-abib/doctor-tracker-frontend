@@ -69,25 +69,25 @@ export const Dialog: React.FC<DialogProps> = ({
         aria-modal="true"
         aria-labelledby={title ? "dialog-title" : undefined}
         className={cn(
-          "relative w-full z-50 overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-2xl transition-all duration-200 animate-in zoom-in-95",
+          "relative w-full z-50 max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-2xl transition-all duration-200 animate-in zoom-in-95",
           maxWidthStyles[maxWidth]
         )}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 rounded-xl p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           aria-label="Close dialog"
         >
           <X className="h-5 w-5" />
         </button>
 
         {title && (
-          <div className="mb-4 pr-8">
-            <h2 id="dialog-title" className="text-xl font-bold tracking-tight text-foreground">
+          <div className="mb-4 pr-7 sm:pr-8">
+            <h2 id="dialog-title" className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
               {title}
             </h2>
             {description && (
-              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">{description}</p>
             )}
           </div>
         )}

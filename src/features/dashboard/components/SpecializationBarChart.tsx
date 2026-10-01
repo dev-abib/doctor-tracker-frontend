@@ -23,35 +23,36 @@ export const SpecializationBarChart: React.FC<Props> = ({ data = [], isLoading }
 
   return (
     <ChartCard
-      title="Doctors by Medical Specialization"
+      title="Doctors by Specialization"
       description="Practitioner headcount across medical departments"
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
-      <div className="h-72 w-full">
+      <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
-            margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
+            margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
           >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.15} />
+            <CartesianGrid strokeDasharray="0 0" vertical={false} stroke="#f1f5f9" />
             <XAxis
               dataKey="specialization"
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
               interval={0}
-              angle={-30}
+              angle={-25}
               textAnchor="end"
-              height={50}
+              height={45}
             />
-            <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
             <Tooltip
+              cursor={{ fill: "rgba(80, 70, 229, 0.05)" }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-xl border border-border bg-card p-3 shadow-xl text-xs">
-                      <p className="font-semibold text-foreground">{item.specialization}</p>
-                      <p className="mt-1 font-bold text-primary">
+                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">{item.specialization}</p>
+                      <p className="mt-1 font-bold text-[#5046e5]">
                         {item.count} Doctor{item.count === 1 ? "" : "s"}
                       </p>
                     </div>
@@ -62,8 +63,9 @@ export const SpecializationBarChart: React.FC<Props> = ({ data = [], isLoading }
             />
             <Bar
               dataKey="count"
-              fill="#6366f1"
+              fill="#5046e5"
               radius={[6, 6, 0, 0]}
+              maxBarSize={32}
             />
           </BarChart>
         </ResponsiveContainer>

@@ -4,11 +4,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Lock, Mail, Activity, KeyRound, Sparkles } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -20,6 +18,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -49,86 +48,135 @@ export const LoginForm: React.FC = () => {
   const fillDemoAdmin = () => {
     setValue("email", "admin@doctortracker.com", { shouldValidate: true });
     setValue("password", "Admin@123456", { shouldValidate: true });
-    toast.info("Admin demo credentials loaded!");
+    toast.info("Admin credentials loaded!");
   };
 
   return (
-    <div className="w-full max-w-md p-8 rounded-3xl border border-border/80 bg-card/80 backdrop-blur-xl shadow-2xl">
-      <div className="flex flex-col items-center text-center mb-8">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-lg shadow-blue-500/30 mb-4">
-          <Activity className="h-7 w-7" />
+    <div className="w-full max-w-4xl overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[36px] bg-white dark:bg-slate-900 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.08)] border border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2">
+      {/* Left Form Section */}
+      <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14">
+        <div>
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#5046e5] text-white shadow-sm">
+                <Activity className="h-5 w-5" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Doctor Tracker
+              </h1>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Sign in to access your clinical dashboard
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email Field */}
+            <div>
+              <div className="relative flex items-center">
+                <input
+                  type="email"
+                  placeholder="admin@doctortracker.com"
+                  className="w-full h-[52px] rounded-2xl bg-[#eff2fc] dark:bg-slate-800/90 px-4 pr-12 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none border border-transparent focus:border-indigo-400 focus:bg-white dark:focus:bg-slate-800 transition-all"
+                  {...register("email")}
+                />
+                <div className="absolute right-3.5 flex h-7 w-7 items-center justify-center rounded-lg bg-[#5046e5] text-white text-xs font-bold shadow-sm">
+                  DT
+                </div>
+              </div>
+              {errors.email && (
+                <p className="mt-1 text-xs text-rose-500 font-medium">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <div className="relative flex items-center">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••••"
+                  className="w-full h-[52px] rounded-2xl bg-[#eff2fc] dark:bg-slate-800/90 px-4 pr-12 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 tracking-wider outline-none border border-transparent focus:border-indigo-400 focus:bg-white dark:focus:bg-slate-800 transition-all"
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-1 text-xs text-rose-500 font-medium">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Forgot Password */}
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                className="text-xs font-medium text-[#5046e5] hover:text-[#4338ca] dark:text-indigo-400 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Sign In Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-[52px] rounded-2xl bg-[#5046e5] hover:bg-[#4338ca] text-white font-medium text-sm transition-all duration-200 shadow-sm active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer mt-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </form>
+
+          {/* Quick Dev Credentials */}
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={fillDemoAdmin}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5046e5] hover:text-[#4338ca] dark:text-indigo-400 transition-colors cursor-pointer group"
+            >
+              <KeyRound className="h-3.5 w-3.5 group-hover:rotate-12 transition-transform" />
+              <span>Quick Dev Credentials</span>
+            </button>
+          </div>
         </div>
-        <h2 className="text-2xl font-black tracking-tight text-foreground">
-          Doctor Tracker
-        </h2>
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          Secure Administrative Clinical Portal
-        </p>
+
+        {/* Footer info */}
+        <div className="mt-8 text-center">
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">
+            Protected clinical admin area • Unauthorized access is monitored
+          </p>
+        </div>
       </div>
 
-      {/* Quick Demo Fill Card */}
-      <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <Sparkles className="h-4 w-4 text-primary shrink-0" />
-          <div className="text-left">
-            <p className="text-xs font-semibold text-foreground">Demo Admin Account</p>
-            <p className="text-[11px] text-muted-foreground">admin@doctortracker.com</p>
-          </div>
-        </div>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={fillDemoAdmin}
-          className="h-7 rounded-lg text-xs bg-card"
-        >
-          Auto Fill
-        </Button>
+      {/* Right Studio Visual Section */}
+      <div className="hidden md:block relative w-full h-full min-h-[480px] bg-slate-100 dark:bg-slate-800">
+        <img
+          src="/images/studio_desk.jpg"
+          alt="Studio Workspace"
+          className="w-full h-full object-cover object-center"
+        />
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold text-foreground mb-1.5">
-            Email Address
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="email"
-              placeholder="admin@doctortracker.com"
-              className="pl-10"
-              error={errors.email?.message}
-              {...register("email")}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-foreground mb-1.5">
-            Password
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="password"
-              placeholder="••••••••"
-              className="pl-10"
-              error={errors.password?.message}
-              {...register("password")}
-            />
-          </div>
-        </div>
-
-        <Button
-          type="submit"
-          variant="gradient"
-          className="w-full h-11 rounded-xl mt-2 font-semibold"
-          isLoading={isSubmitting}
-        >
-          <KeyRound className="h-4 w-4 mr-2" />
-          Sign In
-        </Button>
-      </form>
     </div>
   );
 };

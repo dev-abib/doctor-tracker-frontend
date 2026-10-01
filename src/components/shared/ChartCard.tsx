@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "./EmptyState";
 import { cn } from "@/lib/utils";
@@ -22,31 +21,41 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   action,
   isLoading = false,
   isEmpty = false,
-  emptyTitle = "No chart data available",
-  emptyDescription = "There is not enough data to generate this visualization yet.",
+  emptyTitle = "No data available",
+  emptyDescription = "There is not enough data to render this visualization yet.",
   className,
   children,
 }) => {
   return (
-    <Card className={cn("overflow-hidden border-border/80 flex flex-col justify-between min-w-0 w-full", className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+    <div
+      className={cn(
+        "rounded-2xl border border-[#e8eef6] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-2xs flex flex-col justify-between min-w-0 w-full",
+        className
+      )}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 sm:pb-4 border-b border-[#f1f5f9] dark:border-slate-800/80">
         <div>
-          <CardTitle className="text-base font-semibold">{title}</CardTitle>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+            {title}
+          </h3>
           {description && (
-            <CardDescription className="text-xs">{description}</CardDescription>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+              {description}
+            </p>
           )}
         </div>
-        {action && <div>{action}</div>}
-      </CardHeader>
-      <CardContent className="pt-2 flex-1 flex flex-col justify-center">
+        {action && <div className="shrink-0">{action}</div>}
+      </div>
+
+      <div className="pt-2 flex-1 flex flex-col justify-center">
         {isLoading ? (
-          <div className="flex h-72 w-full flex-col items-center justify-center gap-3">
+          <div className="flex h-64 w-full flex-col items-center justify-center gap-3">
             <Skeleton className="h-4/5 w-full rounded-xl" />
             <div className="flex w-full justify-between gap-4 px-2">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-3.5 w-16" />
             </div>
           </div>
         ) : isEmpty ? (
@@ -54,7 +63,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
         ) : (
           children
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

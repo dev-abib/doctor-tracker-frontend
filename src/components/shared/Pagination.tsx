@@ -48,14 +48,15 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-2">
-      <div className="text-xs sm:text-sm text-muted-foreground">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-4 px-1 sm:px-2">
+      <div className="text-xs text-muted-foreground text-center sm:text-left">
         Showing <span className="font-semibold text-foreground">{startItem}</span> to{" "}
         <span className="font-semibold text-foreground">{endItem}</span> of{" "}
         <span className="font-semibold text-foreground">{total}</span> entries
       </div>
 
-      <div className="flex items-center gap-1.5">
+      {/* Desktop / Tablet Navigation Controls */}
+      <div className="hidden sm:flex items-center gap-1.5">
         <Button
           variant="outline"
           size="icon"
@@ -119,6 +120,35 @@ export const Pagination: React.FC<PaginationProps> = ({
           aria-label="Last page"
         >
           <ChevronsRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Mobile Compact Controls */}
+      <div className="flex sm:hidden items-center justify-between w-full max-w-xs gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 px-3 rounded-lg text-xs flex-1"
+          onClick={() => onPageChange(page - 1)}
+          disabled={page <= 1 || isLoading}
+        >
+          <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+          Prev
+        </Button>
+
+        <span className="text-xs font-semibold px-2 text-foreground whitespace-nowrap">
+          {page} / {totalPages}
+        </span>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 px-3 rounded-lg text-xs flex-1"
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages || isLoading}
+        >
+          Next
+          <ChevronRight className="h-3.5 w-3.5 ml-1" />
         </Button>
       </div>
     </div>

@@ -2,13 +2,13 @@
 
 import React from "react";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  CartesianGrid,
 } from "recharts";
 import { ChartCard } from "@/components/shared/ChartCard";
 import { PatientsPerDoctorStat } from "@/types/api";
@@ -18,21 +18,8 @@ interface Props {
   isLoading?: boolean;
 }
 
-const COLORS = [
-  "#2563eb",
-  "#3b82f6",
-  "#60a5fa",
-  "#0284c7",
-  "#0ea5e9",
-  "#06b6d4",
-  "#14b8a6",
-  "#10b981",
-  "#6366f1",
-  "#8b5cf6",
-];
-
 export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }) => {
-  const chartData = data.map((item) => ({
+  const chartData = data.slice(0, 8).map((item) => ({
     name: item.doctorName.replace("Dr. ", ""),
     fullName: item.doctorName,
     specialization: item.specialization,
@@ -44,34 +31,39 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
   return (
     <ChartCard
       title="Top Doctors by Patient Volume"
-      description="Doctors with highest patient assignments (Top 10)"
+      description="Active patient load assigned across practitioner roster"
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
-      <div className="h-72 w-full">
+      <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            layout="vertical"
+          <LineChart
             data={chartData}
-            margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+            margin={{ top: 15, right: 15, left: -20, bottom: 5 }}
           >
-            <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} />
-            <YAxis
-              type="category"
+            <CartesianGrid strokeDasharray="0 0" vertical={false} stroke="#f1f5f9" />
+            <XAxis
               dataKey="name"
-              width={100}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tickLine={false}
+              axisLine={false}
             />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-xl border border-border bg-card p-3 shadow-xl text-xs">
-                      <p className="font-bold text-foreground">{item.fullName}</p>
-                      <p className="text-muted-foreground">{item.specialization}</p>
-                      <p className="mt-1.5 font-semibold text-primary">
-                        {item.patients} Patient{item.patients === 1 ? "" : "s"}
+                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
+                      <p className="font-bold text-slate-900 dark:text-white">{item.fullName}</p>
+                      <p className="text-slate-400">{item.specialization}</p>
+                      <p className="mt-1 font-bold text-[#5046e5]">
+                        {item.patients} Active Patients
                       </p>
                     </div>
                   );
@@ -79,12 +71,15 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
                 return null;
               }}
             />
-            <Bar dataKey="patients" radius={[0, 8, 8, 0]}>
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
+            <Line
+              type="monotone"
+              dataKey="patients"
+              stroke="#5046e5"
+              strokeWidth={2.5}
+              dot={{ r: 4, fill: "#5046e5", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#5046e5", stroke: "#ffffff", strokeWidth: 2 }}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </ChartCard>

@@ -101,9 +101,9 @@ export default function DoctorDetailPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       {/* Navigation header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <Link
           href="/doctors"
           className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
@@ -115,7 +115,7 @@ export default function DoctorDetailPage() {
         <Button
           variant="gradient"
           size="sm"
-          className="rounded-xl h-9 font-semibold"
+          className="rounded-xl h-9 font-semibold w-full sm:w-auto"
           onClick={() => setIsAddPatientModalOpen(true)}
         >
           <UserPlus className="h-4 w-4 mr-1.5" />
@@ -127,7 +127,7 @@ export default function DoctorDetailPage() {
       <DoctorProfileCard doctor={doctor} />
 
       {/* Patients Roster Section */}
-      <div className="rounded-2xl border border-border/80 bg-card p-6 shadow-sm space-y-5">
+      <div className="rounded-2xl border border-border/80 bg-card p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
           <div>
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
