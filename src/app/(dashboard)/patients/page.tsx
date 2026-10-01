@@ -259,108 +259,105 @@ export default function PatientsPage() {
       />
 
       {/* Modern Integrated Search & Filter Toolbar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3.5 shadow-sm">
-        {/* Main Controls Row */}
-        <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3">
-          {/* Flexible Search Bar */}
-          <div className="flex-1 min-w-0">
-            <SearchInput
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Search by patient name, condition, or phone..."
-              className="w-full"
-            />
-          </div>
+      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3 shadow-xs">
+        {/* Row 1: Dedicated Search Bar (Full Width) */}
+        <div className="w-full">
+          <SearchInput
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search by patient name, condition, or phone..."
+            className="w-full"
+          />
+        </div>
 
-          {/* Quick Filter Selectors */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 shrink-0">
-            {/* Condition Filter */}
-            <Select
-              value={condition}
-              onChange={(e) => {
-                const val = e.target.value;
-                setCondition(val);
-                setPage(1);
-                updateUrlParams({ condition: val, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="">All Conditions</option>
-              {filtersData?.conditions.map((cond) => (
-                <option key={cond} value={cond}>
-                  {cond}
-                </option>
-              ))}
-            </Select>
+        {/* Row 2: Clean Filter Selectors (Responsive Grid: 2 cols on mobile, 3 on tablet, 5 on desktop) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 pt-2 border-t border-border/40">
+          {/* Condition Filter */}
+          <Select
+            value={condition}
+            onChange={(e) => {
+              const val = e.target.value;
+              setCondition(val);
+              setPage(1);
+              updateUrlParams({ condition: val, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="">All Conditions</option>
+            {filtersData?.conditions.map((cond) => (
+              <option key={cond} value={cond}>
+                {cond}
+              </option>
+            ))}
+          </Select>
 
-            {/* Doctor Filter */}
-            <Select
-              value={doctor}
-              onChange={(e) => {
-                const val = e.target.value;
-                setDoctor(val);
-                setPage(1);
-                updateUrlParams({ doctor: val, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="">All Doctors</option>
-              {filtersData?.doctors.map((doc) => (
-                <option key={doc._id} value={doc._id}>
-                  {doc.name}
-                </option>
-              ))}
-            </Select>
+          {/* Doctor Filter */}
+          <Select
+            value={doctor}
+            onChange={(e) => {
+              const val = e.target.value;
+              setDoctor(val);
+              setPage(1);
+              updateUrlParams({ doctor: val, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="">All Doctors</option>
+            {filtersData?.doctors.map((doc) => (
+              <option key={doc._id} value={doc._id}>
+                {doc.name}
+              </option>
+            ))}
+          </Select>
 
-            {/* Gender Filter */}
-            <Select
-              value={gender}
-              onChange={(e) => {
-                const val = e.target.value;
-                setGender(val);
-                setPage(1);
-                updateUrlParams({ gender: val, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="">All Genders</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </Select>
+          {/* Gender Filter */}
+          <Select
+            value={gender}
+            onChange={(e) => {
+              const val = e.target.value;
+              setGender(val);
+              setPage(1);
+              updateUrlParams({ gender: val, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </Select>
 
-            {/* Date Preset */}
-            <Select
-              value={datePreset}
-              onChange={(e) => handleDatePresetChange(e.target.value)}
-              className="h-10 text-xs w-full"
-            >
-              <option value="all">All Dates</option>
-              <option value="today">Today</option>
-              <option value="last7">Last 7 Days</option>
-              <option value="last30">Last 30 Days</option>
-              <option value="thisMonth">This Month</option>
-              <option value="custom">Custom Range...</option>
-            </Select>
+          {/* Date Preset */}
+          <Select
+            value={datePreset}
+            onChange={(e) => handleDatePresetChange(e.target.value)}
+            className="h-10 text-xs w-full"
+          >
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="last7">Last 7 Days</option>
+            <option value="last30">Last 30 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="custom">Custom Range...</option>
+          </Select>
 
-            {/* Sort Order */}
-            <Select
-              value={sort}
-              onChange={(e) => {
-                setSort(e.target.value);
-                setPage(1);
-                updateUrlParams({ sort: e.target.value, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name_asc">Name (A – Z)</option>
-              <option value="name_desc">Name (Z – A)</option>
-              <option value="age_asc">Age (Low – High)</option>
-              <option value="age_desc">Age (High – Low)</option>
-            </Select>
-          </div>
+          {/* Sort Order */}
+          <Select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+              updateUrlParams({ sort: e.target.value, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name_asc">Name (A – Z)</option>
+            <option value="name_desc">Name (Z – A)</option>
+            <option value="age_asc">Age (Low – High)</option>
+            <option value="age_desc">Age (High – Low)</option>
+          </Select>
         </div>
 
         {/* Custom Date Range Selector (only revealed if 'custom' is selected) */}

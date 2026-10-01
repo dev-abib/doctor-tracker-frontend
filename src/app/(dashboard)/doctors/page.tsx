@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Plus, X, Calendar, RotateCcw } from "lucide-react";
+import { Plus, RotateCcw, X, Calendar } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SearchInput } from "@/components/shared/SearchInput";
 import { Pagination } from "@/components/shared/Pagination";
@@ -42,28 +42,8 @@ export default function DoctorsPage() {
   const [hospital, setHospital] = useState(hospitalParam);
   const [startDate, setStartDate] = useState(startDateParam);
   const [endDate, setEndDate] = useState(endDateParam);
+  const [datePreset, setDatePreset] = useState("all");
   const [sort, setSort] = useState(sortParam);
-
-  // Derive date preset
-  const getDatePreset = () => {
-    if (!startDateParam && !endDateParam) return "all";
-    const todayStr = new Date().toISOString().split("T")[0];
-    if (startDateParam === todayStr && endDateParam === todayStr) return "today";
-    const d7 = new Date();
-    d7.setDate(d7.getDate() - 7);
-    const d7Str = d7.toISOString().split("T")[0];
-    if (startDateParam === d7Str && endDateParam === todayStr) return "last7";
-    const d30 = new Date();
-    d30.setDate(d30.getDate() - 30);
-    const d30Str = d30.toISOString().split("T")[0];
-    if (startDateParam === d30Str && endDateParam === todayStr) return "last30";
-    const now = new Date();
-    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-    if (startDateParam === firstOfMonth && endDateParam === todayStr) return "thisMonth";
-    return "custom";
-  };
-
-  const [datePreset, setDatePreset] = useState<string>(getDatePreset());
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -94,7 +74,6 @@ export default function DoctorsPage() {
     setStartDate(startDateParam);
     setEndDate(endDateParam);
     setSort(sortParam);
-    setDatePreset(getDatePreset());
   }, [
     pageParam,
     searchParam,
@@ -136,6 +115,7 @@ export default function DoctorsPage() {
   const handleDatePresetChange = (preset: string) => {
     setDatePreset(preset);
     const todayStr = new Date().toISOString().split("T")[0];
+
     if (preset === "all") {
       setStartDate("");
       setEndDate("");
@@ -164,7 +144,9 @@ export default function DoctorsPage() {
       updateUrlParams({ startDate: dStr, endDate: todayStr, page: 1 });
     } else if (preset === "thisMonth") {
       const now = new Date();
-      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        .toISOString()
+        .split("T")[0];
       setStartDate(firstOfMonth);
       setEndDate(todayStr);
       setPage(1);
@@ -231,90 +213,89 @@ export default function DoctorsPage() {
       />
 
       {/* Modern Integrated Search & Filter Toolbar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3.5 shadow-sm">
-        {/* Main Toolbar Controls Row */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
-          {/* Flexible Search Bar */}
-          <div className="flex-1 min-w-0">
-            <SearchInput
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Search by doctor name, email, hospital, or specialty..."
-              className="w-full"
-            />
-          </div>
-
-          {/* Quick Filter Selectors */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0">
-            {/* Specialization Filter */}
-            <Select
-              value={specialization}
-              onChange={(e) => {
-                setSpecialization(e.target.value);
-                setPage(1);
-                updateUrlParams({ specialization: e.target.value, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="">All Specialties</option>
-              {filtersData?.specializations.map((spec) => (
-                <option key={spec} value={spec}>
-                  {spec}
-                </option>
-              ))}
-            </Select>
-
-            {/* Hospital Filter */}
-            <Select
-              value={hospital}
-              onChange={(e) => {
-                setHospital(e.target.value);
-                setPage(1);
-                updateUrlParams({ hospital: e.target.value, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="">All Hospitals</option>
-              {filtersData?.hospitals.map((hosp) => (
-                <option key={hosp} value={hosp}>
-                  {hosp}
-                </option>
-              ))}
-            </Select>
-
-            {/* Quick Date Range Preset */}
-            <Select
-              value={datePreset}
-              onChange={(e) => handleDatePresetChange(e.target.value)}
-              className="h-10 text-xs w-full"
-            >
-              <option value="all">All Dates</option>
-              <option value="today">Today</option>
-              <option value="last7">Last 7 Days</option>
-              <option value="last30">Last 30 Days</option>
-              <option value="thisMonth">This Month</option>
-              <option value="custom">Custom Range...</option>
-            </Select>
-
-            {/* Sort Order */}
-            <Select
-              value={sort}
-              onChange={(e) => {
-                setSort(e.target.value);
-                setPage(1);
-                updateUrlParams({ sort: e.target.value, page: 1 });
-              }}
-              className="h-10 text-xs w-full"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name_asc">Name (A – Z)</option>
-              <option value="name_desc">Name (Z – A)</option>
-            </Select>
-          </div>
+      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3 shadow-xs">
+        {/* Row 1: Dedicated Search Bar (Full Width) */}
+        <div className="w-full">
+          <SearchInput
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search by doctor name, email, hospital, or specialty..."
+            className="w-full"
+          />
         </div>
 
-        {/* Custom Date Inputs (only revealed if 'custom' is selected) */}
+        {/* Row 2: Clean Filter Selectors (Responsive Grid: 2 cols on mobile, 4 cols on desktop) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-border/40">
+          {/* Specialization Filter */}
+          <Select
+            value={specialization}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSpecialization(val);
+              setPage(1);
+              updateUrlParams({ specialization: val, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="">All Specialties</option>
+            {filtersData?.specializations.map((spec) => (
+              <option key={spec} value={spec}>
+                {spec}
+              </option>
+            ))}
+          </Select>
+
+          {/* Hospital Filter */}
+          <Select
+            value={hospital}
+            onChange={(e) => {
+              const val = e.target.value;
+              setHospital(val);
+              setPage(1);
+              updateUrlParams({ hospital: val, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="">All Hospitals</option>
+            {filtersData?.hospitals.map((hosp) => (
+              <option key={hosp} value={hosp}>
+                {hosp}
+              </option>
+            ))}
+          </Select>
+
+          {/* Date Preset */}
+          <Select
+            value={datePreset}
+            onChange={(e) => handleDatePresetChange(e.target.value)}
+            className="h-10 text-xs w-full"
+          >
+            <option value="all">All Dates</option>
+            <option value="today">Joined Today</option>
+            <option value="last7">Last 7 Days</option>
+            <option value="last30">Last 30 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="custom">Custom Range...</option>
+          </Select>
+
+          {/* Sort Order */}
+          <Select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+              updateUrlParams({ sort: e.target.value, page: 1 });
+            }}
+            className="h-10 text-xs w-full"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name_asc">Name (A – Z)</option>
+            <option value="name_desc">Name (Z – A)</option>
+          </Select>
+        </div>
+
+        {/* Custom Date Range Selector (only revealed if 'custom' is selected) */}
         {datePreset === "custom" && (
           <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
             <span className="font-semibold text-foreground flex items-center gap-1">
@@ -347,7 +328,7 @@ export default function DoctorsPage() {
           </div>
         )}
 
-        {/* Active Filter Chips with 1-Click Dismiss */}
+        {/* Row 3: Active Filter Pills / Reset */}
         {hasActiveFilters && (
           <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs">
             <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -440,7 +421,7 @@ export default function DoctorsPage() {
               variant="ghost"
               size="sm"
               onClick={handleResetFilters}
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive gap-1 ml-auto"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive gap-1 ml-auto cursor-pointer"
             >
               <RotateCcw className="h-3 w-3" />
               Reset All
@@ -461,7 +442,7 @@ export default function DoctorsPage() {
       {data?.meta && (
         <Pagination
           meta={data.meta}
-          onPageChange={(newPage) => setPage(newPage)}
+          onPageChange={handlePageChange}
           isLoading={isLoading}
         />
       )}
