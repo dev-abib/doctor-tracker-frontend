@@ -91,23 +91,23 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
     <>
       <div className="w-full">
         {/* Desktop / Tablet Table */}
-        <div className="hidden md:block overflow-x-auto">
-          <Table>
+        <div className="hidden md:block overflow-x-auto rounded-2xl border border-border/80 bg-card shadow-xs">
+          <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Doctor</TableHead>
-                <TableHead>Specialization</TableHead>
-                <TableHead>Hospital</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead className="text-center">Patients</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="min-w-[220px]">Doctor</TableHead>
+                <TableHead className="whitespace-nowrap">Specialization</TableHead>
+                <TableHead className="min-w-[160px]">Hospital</TableHead>
+                <TableHead className="whitespace-nowrap">Contact</TableHead>
+                <TableHead className="text-center whitespace-nowrap">Patients</TableHead>
+                <TableHead className="whitespace-nowrap">Joined</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {doctors.map((doctor) => (
                 <TableRow key={doctor._id} className="group">
-                  <TableCell>
+                  <TableCell className="min-w-[220px]">
                     <div className="flex items-center gap-3">
                       {doctor.image ? (
                         <img
@@ -116,49 +116,49 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                           className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
                           {doctor.name.replace("Dr. ", "").charAt(0)}
                         </div>
                       )}
-                      <div>
+                      <div className="min-w-0">
                         <Link
                           href={`/doctors/${doctor._id}`}
-                          className="font-bold text-foreground hover:text-primary transition-colors block"
+                          className="font-bold text-foreground hover:text-primary transition-colors block truncate"
                         >
                           {doctor.name}
                         </Link>
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
-                          {doctor.email}
+                        <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                          <Mail className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{doctor.email}</span>
                         </span>
                       </div>
                     </div>
                   </TableCell>
 
-                  <TableCell>
-                    <Badge variant="default" className="font-medium">
-                      <Stethoscope className="h-3 w-3 mr-1" />
+                  <TableCell className="whitespace-nowrap">
+                    <Badge variant="default" className="font-medium whitespace-nowrap">
+                      <Stethoscope className="h-3 w-3 mr-1 shrink-0" />
                       {doctor.specialization}
                     </Badge>
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="min-w-[160px]">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                       <Building2 className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate max-w-[180px]">{doctor.hospital}</span>
                     </div>
                   </TableCell>
 
-                  <TableCell>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <TableCell className="whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
                       <Phone className="h-3 w-3 shrink-0" />
-                      <span>{doctor.phone}</span>
+                      <span className="font-mono whitespace-nowrap">{doctor.phone}</span>
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-center">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-0.5 text-xs font-semibold text-foreground">
-                      <Users className="h-3 w-3 text-muted-foreground" />
+                  <TableCell className="text-center whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-0.5 text-xs font-semibold text-foreground whitespace-nowrap">
+                      <Users className="h-3 w-3 text-muted-foreground shrink-0" />
                       {doctor.patientCount ?? 0}
                     </span>
                   </TableCell>
@@ -167,8 +167,8 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                     {formatDate(doctor.createdAt)}
                   </TableCell>
 
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1.5">
+                  <TableCell className="text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                       <Link href={`/doctors/${doctor._id}`}>
                         <Button
                           variant="ghost"

@@ -171,22 +171,22 @@ export default function DoctorDetailPage() {
           />
         ) : (
           <div className="w-full">
-            <div className="hidden md:block overflow-x-auto">
-              <Table>
+            <div className="hidden md:block overflow-x-auto rounded-2xl border border-border/80 bg-card shadow-xs">
+              <Table className="min-w-[750px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Patient Name</TableHead>
-                    <TableHead>Demographics</TableHead>
-                    <TableHead>Condition</TableHead>
-                    <TableHead>Contact Phone</TableHead>
-                    <TableHead>Visit / Consultation Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="min-w-[200px]">Patient Name</TableHead>
+                    <TableHead className="whitespace-nowrap">Demographics</TableHead>
+                    <TableHead className="whitespace-nowrap">Condition</TableHead>
+                    <TableHead className="whitespace-nowrap">Contact Phone</TableHead>
+                    <TableHead className="whitespace-nowrap">Visit / Consultation Date</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {patientsData?.patients.map((patient) => (
                     <TableRow key={patient._id}>
-                      <TableCell className="font-bold text-foreground">
+                      <TableCell className="font-bold text-foreground min-w-[200px]">
                         <div className="flex items-center gap-2.5">
                           {patient.image ? (
                             <img
@@ -199,10 +199,10 @@ export default function DoctorDetailPage() {
                               {patient.name.charAt(0)}
                             </div>
                           )}
-                          <div>
-                            <span>{patient.name}</span>
+                          <div className="min-w-0">
+                            <span className="block truncate">{patient.name}</span>
                             {patient.email && (
-                              <p className="text-[11px] font-normal text-muted-foreground">
+                              <p className="text-[11px] font-normal text-muted-foreground truncate">
                                 {patient.email}
                               </p>
                             )}
@@ -210,18 +210,18 @@ export default function DoctorDetailPage() {
                         </div>
                       </TableCell>
 
-                      <TableCell className="text-xs text-muted-foreground">
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {patient.age} yrs • {patient.gender}
                       </TableCell>
 
-                      <TableCell>
-                        <Badge variant={getConditionBadgeVariant(patient.condition)}>{patient.condition}</Badge>
+                      <TableCell className="whitespace-nowrap">
+                        <Badge variant={getConditionBadgeVariant(patient.condition)} className="whitespace-nowrap">{patient.condition}</Badge>
                       </TableCell>
 
-                      <TableCell className="text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1.5">
-                          <Phone className="h-3 w-3" />
-                          <span>{patient.phone}</span>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 whitespace-nowrap">
+                          <Phone className="h-3 w-3 shrink-0" />
+                          <span className="font-mono whitespace-nowrap">{patient.phone}</span>
                         </div>
                       </TableCell>
 
@@ -229,7 +229,7 @@ export default function DoctorDetailPage() {
                         {formatDate(patient.visitDate || patient.createdAt)}
                       </TableCell>
 
-                      <TableCell className="text-right">
+                      <TableCell className="text-right whitespace-nowrap">
                         <Button
                           variant="ghost"
                           size="icon"

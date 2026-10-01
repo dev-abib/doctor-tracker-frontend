@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Plus, Filter, RotateCcw } from "lucide-react";
+import { Plus, X, Calendar, RotateCcw } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SearchInput } from "@/components/shared/SearchInput";
 import { Pagination } from "@/components/shared/Pagination";
@@ -46,9 +46,27 @@ export default function PatientsPage() {
   const [startDate, setStartDate] = useState(startDateParam);
   const [endDate, setEndDate] = useState(endDateParam);
   const [sort, setSort] = useState(sortParam);
-  const [showFilters, setShowFilters] = useState(
-    !!(conditionParam || doctorParam || genderParam || startDateParam || endDateParam)
-  );
+
+  // Derive date preset
+  const getDatePreset = () => {
+    if (!startDateParam && !endDateParam) return "all";
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (startDateParam === todayStr && endDateParam === todayStr) return "today";
+    const d7 = new Date();
+    d7.setDate(d7.getDate() - 7);
+    const d7Str = d7.toISOString().split("T")[0];
+    if (startDateParam === d7Str && endDateParam === todayStr) return "last7";
+    const d30 = new Date();
+    d30.setDate(d30.getDate() - 30);
+    const d30Str = d30.toISOString().split("T")[0];
+    if (startDateParam === d30Str && endDateParam === todayStr) return "last30";
+    const now = new Date();
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+    if (startDateParam === firstOfMonth && endDateParam === todayStr) return "thisMonth";
+    return "custom";
+  };
+
+  const [datePreset, setDatePreset] = useState<string>(getDatePreset());
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -69,6 +87,28 @@ export default function PatientsPage() {
     },
     [pathname, router, searchParams]
   );
+
+  // Sync state with URL params on navigation (e.g. browser back/forward)
+  useEffect(() => {
+    setPage(pageParam);
+    setSearch(searchParam);
+    setCondition(conditionParam);
+    setDoctor(doctorParam);
+    setGender(genderParam);
+    setStartDate(startDateParam);
+    setEndDate(endDateParam);
+    setSort(sortParam);
+    setDatePreset(getDatePreset());
+  }, [
+    pageParam,
+    searchParam,
+    conditionParam,
+    doctorParam,
+    genderParam,
+    startDateParam,
+    endDateParam,
+    sortParam,
+  ]);
 
   // Queries & Mutations
   const { data: filtersData } = usePatientFilters();
@@ -99,6 +139,45 @@ export default function PatientsPage() {
     updateUrlParams({ page: newPage });
   };
 
+  const handleDatePresetChange = (preset: string) => {
+    setDatePreset(preset);
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (preset === "all") {
+      setStartDate("");
+      setEndDate("");
+      setPage(1);
+      updateUrlParams({ startDate: undefined, endDate: undefined, page: 1 });
+    } else if (preset === "today") {
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+      setPage(1);
+      updateUrlParams({ startDate: todayStr, endDate: todayStr, page: 1 });
+    } else if (preset === "last7") {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      const dStr = d.toISOString().split("T")[0];
+      setStartDate(dStr);
+      setEndDate(todayStr);
+      setPage(1);
+      updateUrlParams({ startDate: dStr, endDate: todayStr, page: 1 });
+    } else if (preset === "last30") {
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      const dStr = d.toISOString().split("T")[0];
+      setStartDate(dStr);
+      setEndDate(todayStr);
+      setPage(1);
+      updateUrlParams({ startDate: dStr, endDate: todayStr, page: 1 });
+    } else if (preset === "thisMonth") {
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+      setStartDate(firstOfMonth);
+      setEndDate(todayStr);
+      setPage(1);
+      updateUrlParams({ startDate: firstOfMonth, endDate: todayStr, page: 1 });
+    }
+  };
+
   const handleResetFilters = () => {
     setSearch("");
     setCondition("");
@@ -106,6 +185,7 @@ export default function PatientsPage() {
     setGender("");
     setStartDate("");
     setEndDate("");
+    setDatePreset("all");
     setSort("newest");
     setPage(1);
     router.replace(pathname, { scroll: false });
@@ -146,13 +226,17 @@ export default function PatientsPage() {
     await deletePatientMutation.mutateAsync(id);
   };
 
-  const activeFilterCount =
-    (condition ? 1 : 0) +
-    (doctor ? 1 : 0) +
-    (gender ? 1 : 0) +
-    (startDate ? 1 : 0) +
-    (endDate ? 1 : 0) +
-    (sort !== "newest" ? 1 : 0);
+  const hasActiveFilters = !!(
+    search ||
+    condition ||
+    doctor ||
+    gender ||
+    startDate ||
+    endDate ||
+    sort !== "newest"
+  );
+
+  const selectedDoctorObj = filtersData?.doctors.find((d) => d._id === doctor);
 
   const headerAction = (
     <Button
@@ -174,165 +258,260 @@ export default function PatientsPage() {
         action={headerAction}
       />
 
-      {/* Search & Filter Bar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <SearchInput
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Search by patient name, condition, or phone..."
-            className="w-full sm:max-w-md"
-          />
+      {/* Modern Integrated Search & Filter Toolbar */}
+      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3.5 shadow-sm">
+        {/* Main Controls Row */}
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3">
+          {/* Flexible Search Bar */}
+          <div className="flex-1 min-w-0">
+            <SearchInput
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Search by patient name, condition, or phone..."
+              className="w-full"
+            />
+          </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <Button
-              variant={showFilters ? "secondary" : "outline"}
-              size="sm"
-              className="rounded-xl text-xs h-9 flex-1 sm:flex-none justify-center"
-              onClick={() => setShowFilters(!showFilters)}
+          {/* Quick Filter Selectors */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 shrink-0">
+            {/* Condition Filter */}
+            <Select
+              value={condition}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCondition(val);
+                setPage(1);
+                updateUrlParams({ condition: val, page: 1 });
+              }}
+              className="h-10 text-xs w-full"
             >
-              <Filter className="h-3.5 w-3.5 mr-1.5" />
-              <span>Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="ml-1.5 rounded-full bg-primary text-primary-foreground px-1.5 py-0.2 text-[10px] font-bold">
-                  {activeFilterCount}
-                </span>
-              )}
-            </Button>
+              <option value="">All Conditions</option>
+              {filtersData?.conditions.map((cond) => (
+                <option key={cond} value={cond}>
+                  {cond}
+                </option>
+              ))}
+            </Select>
 
-            {activeFilterCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-xl text-xs h-9 text-muted-foreground hover:text-foreground"
-                onClick={handleResetFilters}
-              >
-                <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                Reset
-              </Button>
-            )}
+            {/* Doctor Filter */}
+            <Select
+              value={doctor}
+              onChange={(e) => {
+                const val = e.target.value;
+                setDoctor(val);
+                setPage(1);
+                updateUrlParams({ doctor: val, page: 1 });
+              }}
+              className="h-10 text-xs w-full"
+            >
+              <option value="">All Doctors</option>
+              {filtersData?.doctors.map((doc) => (
+                <option key={doc._id} value={doc._id}>
+                  {doc.name}
+                </option>
+              ))}
+            </Select>
+
+            {/* Gender Filter */}
+            <Select
+              value={gender}
+              onChange={(e) => {
+                const val = e.target.value;
+                setGender(val);
+                setPage(1);
+                updateUrlParams({ gender: val, page: 1 });
+              }}
+              className="h-10 text-xs w-full"
+            >
+              <option value="">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </Select>
+
+            {/* Date Preset */}
+            <Select
+              value={datePreset}
+              onChange={(e) => handleDatePresetChange(e.target.value)}
+              className="h-10 text-xs w-full"
+            >
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="last7">Last 7 Days</option>
+              <option value="last30">Last 30 Days</option>
+              <option value="thisMonth">This Month</option>
+              <option value="custom">Custom Range...</option>
+            </Select>
+
+            {/* Sort Order */}
+            <Select
+              value={sort}
+              onChange={(e) => {
+                setSort(e.target.value);
+                setPage(1);
+                updateUrlParams({ sort: e.target.value, page: 1 });
+              }}
+              className="h-10 text-xs w-full"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name_asc">Name (A – Z)</option>
+              <option value="name_desc">Name (Z – A)</option>
+              <option value="age_asc">Age (Low – High)</option>
+              <option value="age_desc">Age (High – Low)</option>
+            </Select>
           </div>
         </div>
 
-        {/* Collapsible Filter Dropdowns */}
-        {showFilters && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-3 border-t border-border/50 text-xs">
-            <div>
-              <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                Medical Condition
-              </label>
-              <Select
-                value={condition}
+        {/* Custom Date Range Selector (only revealed if 'custom' is selected) */}
+        {datePreset === "custom" && (
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
+            <span className="font-semibold text-foreground flex items-center gap-1">
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+              Custom Date Range:
+            </span>
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                value={startDate}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setCondition(val);
+                  setStartDate(e.target.value);
                   setPage(1);
-                  updateUrlParams({ condition: val, page: 1 });
+                  updateUrlParams({ startDate: e.target.value, page: 1 });
                 }}
-              >
-                <option value="">All Conditions</option>
-                {filtersData?.conditions.map((cond) => (
-                  <option key={cond} value={cond}>
-                    {cond}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                Attending Doctor
-              </label>
-              <Select
-                value={doctor}
+                className="h-8 text-xs w-36 px-2"
+              />
+              <span>to</span>
+              <Input
+                type="date"
+                value={endDate}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setDoctor(val);
+                  setEndDate(e.target.value);
                   setPage(1);
-                  updateUrlParams({ doctor: val, page: 1 });
+                  updateUrlParams({ endDate: e.target.value, page: 1 });
                 }}
-              >
-                <option value="">All Doctors</option>
-                {filtersData?.doctors.map((doc) => (
-                  <option key={doc._id} value={doc._id}>
-                    {doc.name}
-                  </option>
-                ))}
-              </Select>
+                className="h-8 text-xs w-36 px-2"
+              />
             </div>
+          </div>
+        )}
 
-            <div>
-              <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                Gender
-              </label>
-              <Select
-                value={gender}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setGender(val);
-                  setPage(1);
-                  updateUrlParams({ gender: val, page: 1 });
-                }}
-              >
-                <option value="">All Genders</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </Select>
-            </div>
+        {/* Active Filter Chips with 1-Click Dismiss */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs">
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+              Active:
+            </span>
 
-            <div>
-              <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                Sort Order
-              </label>
-              <Select
-                value={sort}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSort(val);
-                  setPage(1);
-                  updateUrlParams({ sort: val, page: 1 });
-                }}
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="name_asc">Name (A – Z)</option>
-                <option value="name_desc">Name (Z – A)</option>
-                <option value="age_asc">Age (Low to High)</option>
-                <option value="age_desc">Age (High to Low)</option>
-              </Select>
-            </div>
+            {search && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 text-xs font-medium">
+                Keyword: &quot;{search}&quot;
+                <button
+                  type="button"
+                  onClick={() => handleSearchChange("")}
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Remove search filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
 
-            <div>
-              <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
-                Date Range
-              </label>
-              <div className="flex items-center gap-1.5">
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setStartDate(val);
+            {condition && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+                Condition: {condition}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCondition("");
                     setPage(1);
-                    updateUrlParams({ startDate: val, page: 1 });
+                    updateUrlParams({ condition: undefined, page: 1 });
                   }}
-                  className="h-10 text-xs px-2 min-w-0 flex-1"
-                />
-                <span className="text-muted-foreground shrink-0">–</span>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setEndDate(val);
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Remove condition filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            {doctor && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+                Doctor: {selectedDoctorObj?.name || "Assigned"}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDoctor("");
                     setPage(1);
-                    updateUrlParams({ endDate: val, page: 1 });
+                    updateUrlParams({ doctor: undefined, page: 1 });
                   }}
-                  className="h-10 text-xs px-2 min-w-0 flex-1"
-                />
-              </div>
-            </div>
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Remove doctor filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            {gender && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+                Gender: {gender}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGender("");
+                    setPage(1);
+                    updateUrlParams({ gender: undefined, page: 1 });
+                  }}
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Remove gender filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            {(startDate || endDate) && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40 px-2.5 py-1 text-xs font-medium">
+                Date: {datePreset !== "custom" ? datePreset : `${startDate || "Any"} – ${endDate || "Any"}`}
+                <button
+                  type="button"
+                  onClick={() => handleDatePresetChange("all")}
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Remove date filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            {sort !== "newest" && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-2.5 py-1 text-xs font-medium">
+                Sort: {sort}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSort("newest");
+                    setPage(1);
+                    updateUrlParams({ sort: undefined, page: 1 });
+                  }}
+                  className="hover:text-destructive cursor-pointer ml-0.5"
+                  title="Reset sort"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetFilters}
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive gap-1 ml-auto"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset All
+            </Button>
           </div>
         )}
       </div>

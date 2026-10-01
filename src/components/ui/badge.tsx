@@ -19,14 +19,14 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    default: "bg-primary/10 text-primary border-primary/20",
-    secondary: "bg-secondary text-secondary-foreground border-transparent",
-    destructive: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-    outline: "text-foreground border-border",
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    purple: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-    info: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+    default: "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/40",
+    secondary: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
+    destructive: "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/40",
+    outline: "text-foreground border-border/80 bg-transparent",
+    success: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40",
+    warning: "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40",
+    purple: "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border-violet-200/60 dark:border-violet-800/40",
+    info: "bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200/60 dark:border-sky-800/40",
   };
 
   return (

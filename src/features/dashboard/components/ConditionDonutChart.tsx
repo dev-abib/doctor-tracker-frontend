@@ -18,13 +18,13 @@ interface Props {
 }
 
 const DONUT_COLORS = [
-  "#f97316", // bright orange
-  "#06b6d4", // cyan
-  "#5046e5", // vibrant indigo
-  "#8b5cf6", // violet
-  "#10b981", // emerald
-  "#ec4899", // pink
-  "#3b82f6", // blue
+  "#4f46e5", // Indigo Primary
+  "#3b82f6", // Royal Blue
+  "#0ea5e9", // Sky Blue
+  "#10b981", // Emerald Accent
+  "#6366f1", // Iris Soft
+  "#0d9488", // Deep Teal
+  "#64748b", // Muted Slate
 ];
 
 export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) => {

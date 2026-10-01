@@ -88,17 +88,17 @@ export const PatientTable: React.FC<Props> = ({
     <>
       <div className="w-full">
         {/* Desktop / Tablet Table */}
-        <div className="hidden md:block overflow-x-auto">
-          <Table>
+        <div className="hidden md:block overflow-x-auto rounded-2xl border border-border/80 bg-card shadow-xs">
+          <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Patient</TableHead>
-                <TableHead>Demographics</TableHead>
-                <TableHead>Condition</TableHead>
-                <TableHead>Attending Doctor</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Visit Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="min-w-[200px]">Patient</TableHead>
+                <TableHead className="whitespace-nowrap">Demographics</TableHead>
+                <TableHead className="whitespace-nowrap">Condition</TableHead>
+                <TableHead className="min-w-[170px]">Attending Doctor</TableHead>
+                <TableHead className="whitespace-nowrap">Contact</TableHead>
+                <TableHead className="whitespace-nowrap">Visit Date</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,7 +107,7 @@ export const PatientTable: React.FC<Props> = ({
 
                 return (
                   <TableRow key={patient._id} className="group">
-                    <TableCell>
+                    <TableCell className="min-w-[200px]">
                       <div className="flex items-center gap-3">
                         {patient.image ? (
                           <img
@@ -120,14 +120,14 @@ export const PatientTable: React.FC<Props> = ({
                             {patient.name.charAt(0)}
                           </div>
                         )}
-                        <div>
-                          <span className="font-bold text-foreground block">
+                        <div className="min-w-0">
+                          <span className="font-bold text-foreground block truncate">
                             {patient.name}
                           </span>
                           {patient.email ? (
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Mail className="h-3 w-3" />
-                              {patient.email}
+                            <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                              <Mail className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{patient.email}</span>
                             </span>
                           ) : (
                             <span className="text-xs text-muted-foreground">No email</span>
@@ -136,27 +136,27 @@ export const PatientTable: React.FC<Props> = ({
                       </div>
                     </TableCell>
 
-                    <TableCell className="text-xs font-medium text-muted-foreground">
+                    <TableCell className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                       {patient.age} yrs • {patient.gender}
                     </TableCell>
 
-                    <TableCell>
-                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-semibold">
+                    <TableCell className="whitespace-nowrap">
+                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-semibold whitespace-nowrap">
                         {patient.condition}
                       </Badge>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="min-w-[170px]">
                       {docObj ? (
                         <Link
                           href={`/doctors/${docObj._id}`}
-                          className="group/doc inline-flex flex-col"
+                          className="group/doc inline-flex flex-col max-w-[180px]"
                         >
-                          <span className="text-xs font-bold text-primary group-hover/doc:underline flex items-center gap-1">
+                          <span className="text-xs font-bold text-primary group-hover/doc:underline flex items-center gap-1 truncate">
                             <Stethoscope className="h-3 w-3 text-primary shrink-0" />
-                            {docObj.name}
+                            <span className="truncate">{docObj.name}</span>
                           </span>
-                          <span className="text-[11px] text-muted-foreground">
+                          <span className="text-[11px] text-muted-foreground truncate">
                             {docObj.specialization}
                           </span>
                         </Link>
@@ -167,10 +167,10 @@ export const PatientTable: React.FC<Props> = ({
                       )}
                     </TableCell>
 
-                    <TableCell>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
                         <Phone className="h-3 w-3 shrink-0" />
-                        <span>{patient.phone}</span>
+                        <span className="font-mono whitespace-nowrap">{patient.phone}</span>
                       </div>
                     </TableCell>
 
@@ -178,8 +178,8 @@ export const PatientTable: React.FC<Props> = ({
                       {formatDate(patient.visitDate || patient.createdAt)}
                     </TableCell>
 
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <TableCell className="text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                         <Button
                           variant="ghost"
                           size="icon"

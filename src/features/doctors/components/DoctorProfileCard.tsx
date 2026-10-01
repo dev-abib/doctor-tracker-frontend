@@ -21,7 +21,7 @@ interface Props {
 export const DoctorProfileCard: React.FC<Props> = ({ doctor }) => {
   return (
     <Card className="overflow-hidden border-border/80 bg-gradient-to-b from-card to-card/50 shadow-md">
-      <div className="h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 relative" />
+      <div className="h-28 bg-gradient-to-r from-indigo-800 via-indigo-900 to-slate-900 relative" />
       <CardContent className="px-4 sm:px-6 pb-5 sm:pb-6 pt-0 relative">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-10 sm:-mt-12 mb-4 sm:mb-5 gap-3 sm:gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-4">
