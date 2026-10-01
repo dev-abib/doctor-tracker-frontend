@@ -187,13 +187,26 @@ export default function DoctorDetailPage() {
                   {patientsData?.patients.map((patient) => (
                     <TableRow key={patient._id}>
                       <TableCell className="font-bold text-foreground">
-                        <div>
-                          <span>{patient.name}</span>
-                          {patient.email && (
-                            <p className="text-[11px] font-normal text-muted-foreground">
-                              {patient.email}
-                            </p>
+                        <div className="flex items-center gap-2.5">
+                          {patient.image ? (
+                            <img
+                              src={patient.image}
+                              alt={patient.name}
+                              className="h-8 w-8 rounded-lg object-cover border border-border/60 shrink-0"
+                            />
+                          ) : (
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
+                              {patient.name.charAt(0)}
+                            </div>
                           )}
+                          <div>
+                            <span>{patient.name}</span>
+                            {patient.email && (
+                              <p className="text-[11px] font-normal text-muted-foreground">
+                                {patient.email}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </TableCell>
 
@@ -241,11 +254,24 @@ export default function DoctorDetailPage() {
                   className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-2.5"
                 >
                   <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-bold text-sm text-foreground">{patient.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {patient.age} yrs • {patient.gender}
-                      </p>
+                    <div className="flex items-center gap-2.5">
+                      {patient.image ? (
+                        <img
+                          src={patient.image}
+                          alt={patient.name}
+                          className="h-9 w-9 rounded-lg object-cover border border-border/60 shrink-0"
+                        />
+                      ) : (
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
+                          {patient.name.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-bold text-sm text-foreground">{patient.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {patient.age} yrs • {patient.gender}
+                        </p>
+                      </div>
                     </div>
                     <Badge variant={getConditionBadgeVariant(patient.condition)} className="text-[11px]">
                       {patient.condition}

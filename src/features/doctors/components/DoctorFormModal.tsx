@@ -4,11 +4,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Upload, X, Camera, Link as LinkIcon } from "lucide-react";
+import { Upload, X, Camera, Link as LinkIcon, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Doctor } from "@/types/api";
+import { authApi } from "@/features/auth/api/authApi";
 
 const doctorFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(120),
@@ -97,6 +99,7 @@ export const DoctorFormModal: React.FC<DoctorFormModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
 
   const {
     register,
@@ -148,12 +151,32 @@ export const DoctorFormModal: React.FC<DoctorFormModalProps> = ({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Show temporary instant preview
+    const tempUrl = URL.createObjectURL(file);
+    setPreviewUrl(tempUrl);
+    setIsUploadingImage(true);
+
     try {
-      const compressed = await compressImage(file);
-      setValue("image", compressed, { shouldValidate: true, shouldDirty: true });
-      setPreviewUrl(compressed);
-    } catch (err) {
-      console.error("Failed to process image file", err);
+      // 1. Stream buffer to Cloudinary via Multer backend endpoint
+      const uploadRes = await authApi.uploadImage(file, "doctors");
+      if (uploadRes?.url) {
+        setValue("image", uploadRes.url, { shouldValidate: true, shouldDirty: true });
+        setPreviewUrl(uploadRes.url);
+        toast.success("Doctor photo uploaded to Cloudinary");
+        return;
+      }
+    } catch {
+      // 2. Graceful offline fallback: local canvas compression
+      try {
+        const compressed = await compressImage(file);
+        setValue("image", compressed, { shouldValidate: true, shouldDirty: true });
+        setPreviewUrl(compressed);
+      } catch (compressionErr) {
+        console.error("Image processing error", compressionErr);
+      }
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -228,11 +251,21 @@ export const DoctorFormModal: React.FC<DoctorFormModalProps> = ({
                   type="button"
                   variant="outline"
                   size="sm"
+                  disabled={isUploadingImage}
                   onClick={() => fileInputRef.current?.click()}
                   className="h-8 text-xs font-medium rounded-xl gap-1.5"
                 >
-                  <Upload className="h-3.5 w-3.5" />
-                  Upload Photo
+                  {isUploadingImage ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-3.5 w-3.5" />
+                      Upload Photo
+                    </>
+                  )}
                 </Button>
                 <Button
                   type="button"

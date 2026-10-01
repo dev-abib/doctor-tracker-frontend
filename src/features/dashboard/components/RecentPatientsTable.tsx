@@ -81,9 +81,17 @@ export const RecentPatientsTable: React.FC<Props> = ({ patients = [], isLoading 
                     <TableRow key={patient._id} className="border-b border-[#f8fafc] dark:border-slate-800/60 hover:bg-[#f8fafc] dark:hover:bg-slate-800/40 transition-colors">
                       <TableCell className="font-semibold text-slate-900 dark:text-white py-3.5">
                         <div className="flex items-center gap-2.5">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400">
-                            <User className="h-3.5 w-3.5" />
-                          </div>
+                          {patient.image ? (
+                            <img
+                              src={patient.image}
+                              alt={patient.name}
+                              className="h-7 w-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                            />
+                          ) : (
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400">
+                              <User className="h-3.5 w-3.5" />
+                            </div>
+                          )}
                           <span className="text-xs font-semibold">{patient.name}</span>
                         </div>
                       </TableCell>
@@ -127,9 +135,17 @@ export const RecentPatientsTable: React.FC<Props> = ({ patients = [], isLoading 
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400">
-                        <User className="h-3.5 w-3.5" />
-                      </div>
+                      {patient.image ? (
+                        <img
+                          src={patient.image}
+                          alt={patient.name}
+                          className="h-7 w-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                        />
+                      ) : (
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400">
+                          <User className="h-3.5 w-3.5" />
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
                           {patient.name}

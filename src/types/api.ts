@@ -18,6 +18,8 @@ export interface User {
   name: string;
   email: string;
   role: "admin";
+  avatar?: string;
+  phone?: string;
   createdAt: string;
 }
 
@@ -42,8 +44,12 @@ export interface Patient {
   gender: "Male" | "Female" | "Other";
   phone: string;
   email?: string;
+  image?: string;
   condition: string;
-  doctor: string | Doctor | { _id: string; name: string; specialization: string; hospital?: string };
+  doctor:
+    | string
+    | Doctor
+    | { _id: string; name: string; specialization: string; hospital?: string };
   visitDate: string;
   createdAt: string;
   updatedAt: string;

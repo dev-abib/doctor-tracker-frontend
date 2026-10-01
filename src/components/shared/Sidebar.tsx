@@ -12,6 +12,7 @@ import {
   Activity,
   X,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -146,6 +147,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     Active
                   </span>
                 </Link>
+
+                <Link
+                  href="/settings"
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium transition-colors",
+                    isNavActive("/settings")
+                      ? "bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 font-semibold shadow-2xs"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </div>
+                  <span className="rounded bg-violet-50 dark:bg-violet-950/80 px-1.5 py-0.5 text-[9px] font-bold text-violet-600 dark:text-violet-400">
+                    Admin
+                  </span>
+                </Link>
               </nav>
             </div>
 
@@ -175,9 +195,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Bottom Profile & Utilities */}
         <div className="border-t border-[#e8eef6] dark:border-slate-800 pt-3 shrink-0 space-y-2">
           <div className="flex items-center justify-between p-2 rounded-2xl bg-[#f8fafc] dark:bg-slate-800/60 border border-[#e8eef6] dark:border-slate-700/60">
-            <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
-              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#5046e5] text-white font-bold text-xs shadow-xs">
-                {user?.name ? user.name.charAt(0) : "D"}
+            <Link
+              href="/settings"
+              onClick={onClose}
+              className="flex items-center gap-2.5 overflow-hidden min-w-0 hover:opacity-85 transition-opacity"
+            >
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#5046e5] text-white font-bold text-xs shadow-xs overflow-hidden">
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{user?.name ? user.name.charAt(0) : "A"}</span>
+                )}
                 <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
               </div>
               <div className="flex flex-col overflow-hidden text-left min-w-0">
@@ -188,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   SUPER ADMIN
                 </span>
               </div>
-            </div>
+            </Link>
 
             <div className="flex items-center gap-1 shrink-0">
               <ThemeToggle />

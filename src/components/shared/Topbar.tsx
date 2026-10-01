@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Menu,
@@ -24,6 +24,7 @@ interface TopbarProps {
 }
 
 export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
+  const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -58,6 +59,13 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
         tag: "RECORDS",
         title: "Patient Management",
         icon: Users,
+      };
+    }
+    if (pathname.startsWith("/settings")) {
+      return {
+        tag: "ADMINISTRATION",
+        title: "Administrator Settings",
+        icon: Settings,
       };
     }
     return {
@@ -175,8 +183,16 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
               className="flex items-center gap-2 rounded-xl bg-[#f8fafc] dark:bg-slate-800/80 p-1 sm:pl-1.5 sm:pr-2.5 sm:py-1 border border-[#e8eef6] dark:border-slate-700/80 shadow-2xs shrink-0 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer"
               aria-label="User Profile Menu"
             >
-              <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-[#5046e5] text-white font-bold text-xs">
-                {user?.name ? user.name.charAt(0) : "D"}
+              <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-[#5046e5] text-white font-bold text-xs overflow-hidden">
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{user?.name ? user.name.charAt(0) : "D"}</span>
+                )}
                 <span className="absolute bottom-0 right-0 h-1.5 w-1.5 rounded-full bg-emerald-500 ring-1 ring-white dark:ring-slate-900" />
               </div>
               <div className="hidden sm:flex flex-col text-left max-w-[150px]">
@@ -213,7 +229,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
                     type="button"
                     onClick={() => {
                       setIsDropdownOpen(false);
-                      toast.info("Doctor profile and credentials settings.");
+                      router.push("/settings");
                     }}
                     className="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-[#eff2fc] hover:text-[#5046e5] dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >

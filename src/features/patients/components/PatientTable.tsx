@@ -109,9 +109,17 @@ export const PatientTable: React.FC<Props> = ({
                   <TableRow key={patient._id} className="group">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                          {patient.name.charAt(0)}
-                        </div>
+                        {patient.image ? (
+                          <img
+                            src={patient.image}
+                            alt={patient.name}
+                            className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
+                          />
+                        ) : (
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                            {patient.name.charAt(0)}
+                          </div>
+                        )}
                         <div>
                           <span className="font-bold text-foreground block">
                             {patient.name}
@@ -211,9 +219,17 @@ export const PatientTable: React.FC<Props> = ({
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                      {patient.name.charAt(0)}
-                    </div>
+                    {patient.image ? (
+                      <img
+                        src={patient.image}
+                        alt={patient.name}
+                        className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                        {patient.name.charAt(0)}
+                      </div>
+                    )}
                     <div>
                       <span className="font-bold text-sm text-foreground block">
                         {patient.name}

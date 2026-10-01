@@ -12,6 +12,7 @@ import {
   ArrowRight,
   ExternalLink,
   User,
+  Settings,
 } from "lucide-react";
 import { useDoctorsList } from "@/features/doctors/hooks/useDoctors";
 import { usePatientsList } from "@/features/patients/hooks/usePatients";
@@ -76,6 +77,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
     { label: "Dashboard", href: "/", icon: LayoutDashboard },
     { label: "Doctors Directory", href: "/doctors", icon: Stethoscope },
     { label: "Patient Records", href: "/patients", icon: Users },
+    { label: "Admin Settings", href: "/settings", icon: Settings },
   ].filter((p) =>
     query ? p.label.toLowerCase().includes(query.toLowerCase()) : true
   );
@@ -177,9 +179,17 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                       className="flex w-full items-center justify-between p-2.5 rounded-xl hover:bg-[#eff2fc] dark:hover:bg-slate-800 transition-colors text-left group cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600">
-                          <User className="h-4 w-4" />
-                        </div>
+                        {patient.image ? (
+                          <img
+                            src={patient.image}
+                            alt={patient.name}
+                            className="h-8 w-8 shrink-0 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                          />
+                        ) : (
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600">
+                            <User className="h-4 w-4" />
+                          </div>
+                        )}
                         <div className="truncate">
                           <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#5046e5] transition-colors">
                             {patient.name}
