@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getConditionBadgeVariant } from "@/lib/utils";
 import { Patient } from "@/types/api";
 
 interface Props {
@@ -85,7 +85,7 @@ export const RecentPatientsTable: React.FC<Props> = ({ patients = [], isLoading 
                       {patient.age} yrs • {patient.gender}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="purple">{patient.condition}</Badge>
+                      <Badge variant={getConditionBadgeVariant(patient.condition)}>{patient.condition}</Badge>
                     </TableCell>
                     <TableCell>
                       {docObj ? (

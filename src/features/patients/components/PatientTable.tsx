@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getConditionBadgeVariant } from "@/lib/utils";
 import { Patient } from "@/types/api";
 
 interface Props {
@@ -133,7 +133,7 @@ export const PatientTable: React.FC<Props> = ({
                     </TableCell>
 
                     <TableCell>
-                      <Badge variant="purple" className="font-semibold">
+                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-semibold">
                         {patient.condition}
                       </Badge>
                     </TableCell>
@@ -223,7 +223,7 @@ export const PatientTable: React.FC<Props> = ({
                       </p>
                     </div>
                   </div>
-                  <Badge variant="purple" className="text-[11px]">
+                  <Badge variant={getConditionBadgeVariant(patient.condition)} className="text-[11px]">
                     {patient.condition}
                   </Badge>
                 </div>

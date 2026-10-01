@@ -2,7 +2,7 @@ import React from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 
 interface StatCardProps {
   title: string;
@@ -64,7 +64,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </div>
         <div className="mt-4">
           <div className="text-3xl font-extrabold tracking-tight text-foreground">
-            {value}
+            {typeof value === "number" ? formatNumber(value) : value}
           </div>
 
           {trend && (

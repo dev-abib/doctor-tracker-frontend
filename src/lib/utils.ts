@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function formatNumber(num: number | undefined | null): string {
+  if (num === undefined || num === null) return "0";
+  return new Intl.NumberFormat("en-US").format(num);
+}
+
 export function formatDate(dateString: string | Date | undefined): string {
   if (!dateString) return "N/A";
   try {
@@ -35,4 +40,24 @@ export function formatDateTime(dateString: string | Date | undefined): string {
   } catch {
     return "N/A";
   }
+}
+
+export function getConditionBadgeVariant(condition: string): "default" | "destructive" | "warning" | "success" | "purple" | "info" {
+  const lower = condition.toLowerCase();
+  if (lower.includes("cardiac") || lower.includes("artery") || lower.includes("hypertension")) {
+    return "destructive";
+  }
+  if (lower.includes("asthma") || lower.includes("bronchitis") || lower.includes("pulmon")) {
+    return "info";
+  }
+  if (lower.includes("diabetes") || lower.includes("thyroid") || lower.includes("reflux")) {
+    return "warning";
+  }
+  if (lower.includes("migraine") || lower.includes("depress") || lower.includes("anxiety")) {
+    return "purple";
+  }
+  if (lower.includes("eczema") || lower.includes("osteo") || lower.includes("arthrit")) {
+    return "success";
+  }
+  return "default";
 }

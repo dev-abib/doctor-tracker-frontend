@@ -38,7 +38,7 @@ import {
   useAddPatientToDoctor,
   useDeletePatientFromDoctor,
 } from "@/features/doctors/hooks/useDoctors";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getConditionBadgeVariant } from "@/lib/utils";
 import { Patient } from "@/types/api";
 
 export default function DoctorDetailPage() {
@@ -202,7 +202,7 @@ export default function DoctorDetailPage() {
                       </TableCell>
 
                       <TableCell>
-                        <Badge variant="purple">{patient.condition}</Badge>
+                        <Badge variant={getConditionBadgeVariant(patient.condition)}>{patient.condition}</Badge>
                       </TableCell>
 
                       <TableCell className="text-xs text-muted-foreground">
@@ -247,7 +247,7 @@ export default function DoctorDetailPage() {
                         {patient.age} yrs • {patient.gender}
                       </p>
                     </div>
-                    <Badge variant="purple" className="text-[11px]">
+                    <Badge variant={getConditionBadgeVariant(patient.condition)} className="text-[11px]">
                       {patient.condition}
                     </Badge>
                   </div>
