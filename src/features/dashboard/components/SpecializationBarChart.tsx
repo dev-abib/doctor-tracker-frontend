@@ -34,7 +34,7 @@ export const SpecializationBarChart: React.FC<Props> = ({ data = [], isLoading }
             data={data}
             margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
           >
-            <CartesianGrid strokeDasharray="0 0" vertical={false} stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.2)" />
             <XAxis
               dataKey="specialization"
               tick={{ fontSize: 10, fill: "#94a3b8" }}
@@ -45,14 +45,14 @@ export const SpecializationBarChart: React.FC<Props> = ({ data = [], isLoading }
             />
             <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
             <Tooltip
-              cursor={{ fill: "rgba(80, 70, 229, 0.05)" }}
+              cursor={{ fill: "rgba(80, 70, 229, 0.08)" }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
                     <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
                       <p className="font-semibold text-slate-800 dark:text-slate-200">{item.specialization}</p>
-                      <p className="mt-1 font-bold text-[#5046e5]">
+                      <p className="mt-1 font-bold text-[#5046e5] dark:text-indigo-400">
                         {item.count} Doctor{item.count === 1 ? "" : "s"}
                       </p>
                     </div>

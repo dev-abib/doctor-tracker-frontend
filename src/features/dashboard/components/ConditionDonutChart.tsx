@@ -29,6 +29,7 @@ const DONUT_COLORS = [
 
 export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) => {
   const isEmpty = !isLoading && data.length === 0;
+  const totalCount = data.reduce((acc, item) => acc + (item.count || 0), 0);
 
   return (
     <ChartCard
@@ -44,11 +45,16 @@ export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) =
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
+                  const pct =
+                    item.percentage ||
+                    (totalCount > 0
+                      ? `${Math.round((item.count / totalCount) * 100)}%`
+                      : "0%");
                   return (
                     <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
                       <p className="font-semibold text-slate-800 dark:text-slate-200">{item.condition}</p>
-                      <p className="mt-1 font-bold text-[#5046e5]">
-                        {item.count} Patients ({item.percentage || ""})
+                      <p className="mt-1 font-bold text-[#5046e5] dark:text-indigo-400">
+                        {item.count} Patients ({pct})
                       </p>
                     </div>
                   );
@@ -76,7 +82,7 @@ export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) =
                 <Cell
                   key={`cell-${index}`}
                   fill={DONUT_COLORS[index % DONUT_COLORS.length]}
-                  stroke="#ffffff"
+                  className="stroke-card transition-all"
                   strokeWidth={2}
                 />
               ))}

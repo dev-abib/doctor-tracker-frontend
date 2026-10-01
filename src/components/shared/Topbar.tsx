@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Menu,
@@ -9,6 +10,9 @@ import {
   ChevronDown,
   Settings,
   LogOut,
+  Stethoscope,
+  Users,
+  UserCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ThemeToggle } from "./ThemeToggle";
@@ -20,10 +24,51 @@ interface TopbarProps {
 }
 
 export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Compute section tag and title based on current path
+  const getPageInfo = () => {
+    if (pathname === "/") {
+      return {
+        tag: "OVERVIEW",
+        title: "Clinical Dashboard",
+        icon: LayoutDashboard,
+      };
+    }
+    if (pathname.startsWith("/doctors/")) {
+      return {
+        tag: "PRACTITIONER",
+        title: "Doctor Profile & Roster",
+        icon: UserCheck,
+      };
+    }
+    if (pathname.startsWith("/doctors")) {
+      return {
+        tag: "MANAGEMENT",
+        title: "Doctor Directory",
+        icon: Stethoscope,
+      };
+    }
+    if (pathname.startsWith("/patients")) {
+      return {
+        tag: "RECORDS",
+        title: "Patient Management",
+        icon: Users,
+      };
+    }
+    return {
+      tag: "PORTAL",
+      title: "Doctor Tracker",
+      icon: LayoutDashboard,
+    };
+  };
+
+  const pageInfo = getPageInfo();
+  const IconComponent = pageInfo.icon;
 
   // Global CTRL+K / CMD+K keyboard shortcut listener
   useEffect(() => {
@@ -66,14 +111,14 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
 
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 shadow-2xs">
-              <LayoutDashboard className="h-4 w-4" />
+              <IconComponent className="h-4 w-4" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none truncate">
-                OVERVIEW
+                {pageInfo.tag}
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight mt-0.5 truncate">
-                Clinical Dashboard
+                {pageInfo.title}
               </span>
             </div>
           </div>

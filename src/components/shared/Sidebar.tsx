@@ -16,6 +16,8 @@ import {
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
+import { ThemeToggle } from "./ThemeToggle";
+
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -170,15 +172,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Bottom Profile Card */}
-        <div className="border-t border-[#e8eef6] dark:border-slate-800 pt-3 shrink-0">
+        {/* Bottom Profile & Utilities */}
+        <div className="border-t border-[#e8eef6] dark:border-slate-800 pt-3 shrink-0 space-y-2">
           <div className="flex items-center justify-between p-2 rounded-2xl bg-[#f8fafc] dark:bg-slate-800/60 border border-[#e8eef6] dark:border-slate-700/60">
-            <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
               <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#5046e5] text-white font-bold text-xs shadow-xs">
                 {user?.name ? user.name.charAt(0) : "D"}
                 <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
               </div>
-              <div className="flex flex-col overflow-hidden text-left">
+              <div className="flex flex-col overflow-hidden text-left min-w-0">
                 <span className="truncate text-xs font-bold text-slate-900 dark:text-white leading-tight">
                   {user?.name || "Dr. Administrator"}
                 </span>
@@ -188,13 +190,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <button
-              onClick={logout}
-              className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
-              title="Sign Out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <ThemeToggle />
+              <button
+                onClick={logout}
+                className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer"
+                title="Sign Out"
+                aria-label="Sign Out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </aside>

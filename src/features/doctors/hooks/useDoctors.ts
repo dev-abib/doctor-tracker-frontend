@@ -107,6 +107,7 @@ export const useAddPatientToDoctor = () => {
       data: CreatePatientUnderDoctorPayload;
     }) => doctorsApi.addPatient(doctorId, data),
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
       queryClient.invalidateQueries({
         queryKey: ["doctors", "patients", variables.doctorId],
       });
@@ -135,6 +136,7 @@ export const useDeletePatientFromDoctor = () => {
       patientId: string;
     }) => doctorsApi.deletePatient(doctorId, patientId),
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
       queryClient.invalidateQueries({
         queryKey: ["doctors", "patients", variables.doctorId],
       });

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Plus, Filter, RotateCcw } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SearchInput } from "@/components/shared/SearchInput";
@@ -20,20 +21,70 @@ import {
 import { Doctor } from "@/types/api";
 
 export default function DoctorsPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Read initial query state from URL params
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+  const searchParam = searchParams.get("search") || "";
+  const specializationParam = searchParams.get("specialization") || "";
+  const hospitalParam = searchParams.get("hospital") || "";
+  const startDateParam = searchParams.get("startDate") || "";
+  const endDateParam = searchParams.get("endDate") || "";
+  const sortParam = searchParams.get("sort") || "newest";
+
   // Query parameters state
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(pageParam);
   const [limit] = useState(10);
-  const [search, setSearch] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [hospital, setHospital] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [sort, setSort] = useState("newest");
-  const [showFilters, setShowFilters] = useState(false);
+  const [search, setSearch] = useState(searchParam);
+  const [specialization, setSpecialization] = useState(specializationParam);
+  const [hospital, setHospital] = useState(hospitalParam);
+  const [startDate, setStartDate] = useState(startDateParam);
+  const [endDate, setEndDate] = useState(endDateParam);
+  const [sort, setSort] = useState(sortParam);
+  const [showFilters, setShowFilters] = useState(
+    !!(specializationParam || hospitalParam || startDateParam || endDateParam)
+  );
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+
+  // Sync state into URL params
+  const updateUrlParams = useCallback(
+    (paramsObj: Record<string, string | number | undefined>) => {
+      const current = new URLSearchParams(searchParams.toString());
+      Object.entries(paramsObj).forEach(([key, value]) => {
+        if (value === undefined || value === "" || (key === "page" && value === 1)) {
+          current.delete(key);
+        } else {
+          current.set(key, String(value));
+        }
+      });
+      router.replace(`${pathname}?${current.toString()}`, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Sync state with URL params on navigation (e.g. browser back/forward)
+  useEffect(() => {
+    setPage(pageParam);
+    setSearch(searchParam);
+    setSpecialization(specializationParam);
+    setHospital(hospitalParam);
+    setStartDate(startDateParam);
+    setEndDate(endDateParam);
+    setSort(sortParam);
+  }, [
+    pageParam,
+    searchParam,
+    specializationParam,
+    hospitalParam,
+    startDateParam,
+    endDateParam,
+    sortParam,
+  ]);
 
   // Queries & Mutations
   const { data: filtersData } = useDoctorFilters();
@@ -55,6 +106,12 @@ export default function DoctorsPage() {
   const handleSearchChange = (val: string) => {
     setSearch(val);
     setPage(1);
+    updateUrlParams({ search: val, page: 1 });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    updateUrlParams({ page: newPage });
   };
 
   const handleResetFilters = () => {
@@ -65,6 +122,7 @@ export default function DoctorsPage() {
     setEndDate("");
     setSort("newest");
     setPage(1);
+    router.replace(pathname, { scroll: false });
   };
 
   const handleCreateSubmit = async (formData: DoctorFormData) => {
@@ -163,6 +221,7 @@ export default function DoctorsPage() {
                 onChange={(e) => {
                   setSpecialization(e.target.value);
                   setPage(1);
+                  updateUrlParams({ specialization: e.target.value, page: 1 });
                 }}
               >
                 <option value="">All Specializations</option>
@@ -183,6 +242,7 @@ export default function DoctorsPage() {
                 onChange={(e) => {
                   setHospital(e.target.value);
                   setPage(1);
+                  updateUrlParams({ hospital: e.target.value, page: 1 });
                 }}
               >
                 <option value="">All Hospitals</option>
@@ -203,6 +263,7 @@ export default function DoctorsPage() {
                 onChange={(e) => {
                   setSort(e.target.value);
                   setPage(1);
+                  updateUrlParams({ sort: e.target.value, page: 1 });
                 }}
               >
                 <option value="newest">Newest First</option>
@@ -223,6 +284,7 @@ export default function DoctorsPage() {
                   onChange={(e) => {
                     setStartDate(e.target.value);
                     setPage(1);
+                    updateUrlParams({ startDate: e.target.value, page: 1 });
                   }}
                   className="h-10 text-xs px-2 min-w-0 flex-1"
                 />
@@ -233,6 +295,7 @@ export default function DoctorsPage() {
                   onChange={(e) => {
                     setEndDate(e.target.value);
                     setPage(1);
+                    updateUrlParams({ endDate: e.target.value, page: 1 });
                   }}
                   className="h-10 text-xs px-2 min-w-0 flex-1"
                 />

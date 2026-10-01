@@ -56,25 +56,33 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5 sm:gap-4">
         <StatCard
           title="Total Doctors"
-          value={summary?.totalDoctors ?? 36}
+          value={summary?.totalDoctors ?? 0}
           icon={<Stethoscope className="h-4 w-4" />}
-          trendText="+100% this month"
-          trendType="positive"
+          trendText={
+            summary?.totalDoctors
+              ? `${summary.totalDoctors} active practitioner${summary.totalDoctors === 1 ? "" : "s"}`
+              : "0 registered"
+          }
+          trendType="highlight"
           isLoading={isLoading}
         />
 
         <StatCard
           title="Active Patients"
-          value={summary?.totalPatients ?? 360}
+          value={summary?.totalPatients ?? 0}
           icon={<Users className="h-4 w-4" />}
-          trendText="+78% retention"
-          trendType="positive"
+          trendText={
+            summary
+              ? `${summary.momGrowthPercentage >= 0 ? `+${summary.momGrowthPercentage}%` : `${summary.momGrowthPercentage}%`} MoM growth`
+              : "0% MoM"
+          }
+          trendType={summary && summary.momGrowthPercentage >= 0 ? "positive" : "neutral"}
           isLoading={isLoading}
         />
 
         <StatCard
           title="System Admins"
-          value={2}
+          value={1}
           icon={<Shield className="h-4 w-4" />}
           subtext="Super admin access"
           isLoading={isLoading}
@@ -82,16 +90,20 @@ export default function DashboardPage() {
 
         <StatCard
           title="Avg Workload"
-          value={`${summary?.avgPatientsPerDoctor ?? 10} / Doc`}
+          value={`${summary?.avgPatientsPerDoctor ?? 0} / Doc`}
           icon={<Activity className="h-4 w-4" />}
-          trendText="Active milestone record"
+          trendText={
+            summary?.newPatientsThisMonth
+              ? `+${summary.newPatientsThisMonth} new this month`
+              : "Standard load"
+          }
           trendType="positive"
           isLoading={isLoading}
         />
 
         <StatCard
           title="Clinical Capacity"
-          value="6 / 6 Live"
+          value={summary?.totalDoctors ? `${summary.totalDoctors} Active Units` : "Ready"}
           icon={<Zap className="h-4 w-4" />}
           subtext="100% operational"
           isLoading={isLoading}

@@ -41,7 +41,7 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
             data={chartData}
             margin={{ top: 15, right: 15, left: -20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="0 0" vertical={false} stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.2)" />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 11, fill: "#94a3b8" }}
@@ -62,7 +62,7 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
                     <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
                       <p className="font-bold text-slate-900 dark:text-white">{item.fullName}</p>
                       <p className="text-slate-400">{item.specialization}</p>
-                      <p className="mt-1 font-bold text-[#5046e5]">
+                      <p className="mt-1 font-bold text-[#5046e5] dark:text-indigo-400">
                         {item.patients} Active Patients
                       </p>
                     </div>
@@ -77,7 +77,7 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
               stroke="#5046e5"
               strokeWidth={2.5}
               dot={{ r: 4, fill: "#5046e5", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#5046e5", stroke: "#ffffff", strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: "#5046e5", stroke: "var(--card)", strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
