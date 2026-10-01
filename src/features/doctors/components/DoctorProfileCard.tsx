@@ -25,9 +25,17 @@ export const DoctorProfileCard: React.FC<Props> = ({ doctor }) => {
       <CardContent className="px-4 sm:px-6 pb-5 sm:pb-6 pt-0 relative">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-10 sm:-mt-12 mb-4 sm:mb-5 gap-3 sm:gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-4">
-            <div className="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl border-4 border-card bg-primary text-primary-foreground shadow-xl text-2xl sm:text-3xl font-extrabold">
-              {doctor.name.replace("Dr. ", "").charAt(0)}
-            </div>
+            {doctor.image ? (
+              <img
+                src={doctor.image}
+                alt={doctor.name}
+                className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-2xl sm:rounded-3xl border-4 border-card object-cover shadow-xl"
+              />
+            ) : (
+              <div className="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl border-4 border-card bg-primary text-primary-foreground shadow-xl text-2xl sm:text-3xl font-extrabold">
+                {doctor.name.replace("Dr. ", "").charAt(0)}
+              </div>
+            )}
             <div className="mb-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg sm:text-2xl font-black text-foreground">

@@ -131,9 +131,17 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                     className="flex w-full items-center justify-between p-2.5 rounded-xl hover:bg-[#eff2fc] dark:hover:bg-slate-800 transition-colors text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-[#5046e5]">
-                        <Stethoscope className="h-4 w-4" />
-                      </div>
+                      {doc.image ? (
+                        <img
+                          src={doc.image}
+                          alt={doc.name}
+                          className="h-8 w-8 shrink-0 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                        />
+                      ) : (
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-[#5046e5]">
+                          <Stethoscope className="h-4 w-4" />
+                        </div>
+                      )}
                       <div className="truncate">
                         <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#5046e5] transition-colors">
                           {doc.name}

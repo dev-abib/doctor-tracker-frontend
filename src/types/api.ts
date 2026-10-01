@@ -28,6 +28,7 @@ export interface Doctor {
   hospital: string;
   phone: string;
   email: string;
+  image?: string;
   patientCount?: number;
   recentPatients?: Patient[];
   createdAt: string;

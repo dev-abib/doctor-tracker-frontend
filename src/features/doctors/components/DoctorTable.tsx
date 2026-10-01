@@ -109,9 +109,17 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                 <TableRow key={doctor._id} className="group">
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
-                        {doctor.name.replace("Dr. ", "").charAt(0)}
-                      </div>
+                      {doctor.image ? (
+                        <img
+                          src={doctor.image}
+                          alt={doctor.name}
+                          className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                          {doctor.name.replace("Dr. ", "").charAt(0)}
+                        </div>
+                      )}
                       <div>
                         <Link
                           href={`/doctors/${doctor._id}`}
@@ -206,9 +214,17 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
-                    {doctor.name.replace("Dr. ", "").charAt(0)}
-                  </div>
+                  {doctor.image ? (
+                    <img
+                      src={doctor.image}
+                      alt={doctor.name}
+                      className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
+                      {doctor.name.replace("Dr. ", "").charAt(0)}
+                    </div>
+                  )}
                   <div>
                     <Link
                       href={`/doctors/${doctor._id}`}
