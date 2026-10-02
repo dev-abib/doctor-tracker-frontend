@@ -128,29 +128,32 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       {/* Live Executive Dashboard Welcome Banner */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 rounded-3xl bg-gradient-to-r from-card via-card to-primary/5 border border-border/80 p-4 sm:p-6 shadow-xs relative overflow-hidden">
-        <div className="flex items-center gap-3.5 min-w-0">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 rounded-3xl bg-gradient-to-r from-card via-card to-primary/5 border border-border/80 p-4 sm:p-6 shadow-xs relative overflow-hidden w-full">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 w-full lg:w-auto">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
             <LayoutDashboard className="h-5 w-5" />
           </div>
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
                 CLINICAL EXECUTIVE HUB
               </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             </div>
-            <h1 className="text-lg sm:text-2xl font-black text-foreground leading-tight mt-0.5 truncate">
+            <h1
+              className="text-base sm:text-xl lg:text-2xl font-black text-foreground leading-tight mt-0.5 truncate"
+              title={`${greeting}, ${user?.name || "Dr. Administrator"}`}
+            >
               {greeting}, {user?.name || "Dr. Administrator"}
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
+            <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block truncate">
               Hospital analytics, patient admissions and practitioner roster overview.
             </p>
           </div>
         </div>
 
         {/* Banner Right: Live Clock & Quick Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start lg:justify-end shrink-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto justify-start lg:justify-end shrink-0">
           {/* Live Date / Time Badge */}
           {currentTime && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card border border-border/80 text-xs font-semibold text-muted-foreground shadow-2xs">
@@ -162,39 +165,41 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleExportSummary}
-            className="h-9 rounded-xl text-xs font-semibold gap-1.5"
-            title="Download CSV report"
-          >
-            <Download className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="hidden sm:inline">Export CSV</span>
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleExportSummary}
+              className="h-9 px-2.5 sm:px-3 rounded-xl text-xs font-semibold gap-1.5 shrink-0"
+              title="Download CSV report"
+            >
+              <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setIsPatientModalOpen(true)}
-            className="h-9 rounded-xl text-xs font-semibold gap-1.5"
-          >
-            <UserPlus className="h-3.5 w-3.5 text-primary" />
-            <span>Register Patient</span>
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPatientModalOpen(true)}
+              className="h-9 flex-1 sm:flex-initial rounded-xl text-xs font-semibold gap-1.5 justify-center"
+            >
+              <UserPlus className="h-3.5 w-3.5 text-primary shrink-0" />
+              <span className="truncate">Register Patient</span>
+            </Button>
 
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={() => setIsDoctorModalOpen(true)}
-            className="h-9 rounded-xl text-xs font-semibold gap-1.5 shadow-sm"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Doctor</span>
-          </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={() => setIsDoctorModalOpen(true)}
+              className="h-9 flex-1 sm:flex-initial rounded-xl text-xs font-semibold gap-1.5 shadow-sm justify-center"
+            >
+              <Plus className="h-4 w-4 shrink-0" />
+              <span className="truncate">Add Doctor</span>
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -365,8 +365,8 @@ export const PatientTable: React.FC<Props> = ({
                 key={patient._id}
                 className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     {patient.image ? (
                       <img
                         src={patient.image}
@@ -378,18 +378,19 @@ export const PatientTable: React.FC<Props> = ({
                         {(patient.name || "P").charAt(0)}
                       </div>
                     )}
-                    <div>
-                      <p className="font-bold text-sm text-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-sm text-foreground truncate" title={patient.name}>
                         {patient.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground truncate">
                         {patient.age} yrs • {patient.gender}
                       </p>
                     </div>
                   </div>
                   <Badge
                     variant={getConditionBadgeVariant(patient.condition)}
-                    className="text-[11px]"
+                    className="text-[11px] shrink-0 max-w-32 sm:max-w-38 truncate text-center"
+                    title={patient.condition}
                   >
                     {patient.condition}
                   </Badge>

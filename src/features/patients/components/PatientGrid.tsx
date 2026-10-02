@@ -146,9 +146,10 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
                   <div>
                     <Badge
                       variant={getConditionBadgeVariant(patient.condition)}
-                      className="text-[11px] font-medium py-0 px-2 h-5"
+                      className="text-[11px] font-medium py-0 px-2 h-5 max-w-full inline-flex items-center"
+                      title={patient.condition}
                     >
-                      {patient.condition}
+                      <span className="truncate max-w-44">{patient.condition}</span>
                     </Badge>
                   </div>
 

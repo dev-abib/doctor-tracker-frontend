@@ -293,8 +293,8 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
               key={doctor._id}
               className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   {doctor.image ? (
                     <img
                       src={doctor.image}
@@ -306,17 +306,24 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                       {(doctor.name || "D").replace("Dr. ", "").charAt(0)}
                     </div>
                   )}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <Link
                       href={`/doctors/${doctor._id}`}
-                      className="font-bold text-sm text-foreground hover:text-primary"
+                      className="font-bold text-sm text-foreground hover:text-primary truncate block"
+                      title={doctor.name}
                     >
                       {doctor.name}
                     </Link>
-                    <p className="text-xs text-muted-foreground">{doctor.email}</p>
+                    <p className="text-xs text-muted-foreground truncate" title={doctor.email}>
+                      {doctor.email}
+                    </p>
                   </div>
                 </div>
-                <Badge variant="default" className="text-[11px]">
+                <Badge
+                  variant="default"
+                  className="text-[11px] shrink-0 max-w-32 sm:max-w-36 truncate text-center"
+                  title={doctor.specialization}
+                >
                   {doctor.specialization}
                 </Badge>
               </div>

@@ -155,7 +155,11 @@ export const RecentPatientsTable: React.FC<Props> = ({ patients = [], isLoading 
                         </p>
                       </div>
                     </div>
-                    <Badge variant={getConditionBadgeVariant(patient.condition)} className="text-[10px] shrink-0">
+                    <Badge
+                      variant={getConditionBadgeVariant(patient.condition)}
+                      className="text-[10px] shrink-0 max-w-28 sm:max-w-32 truncate"
+                      title={patient.condition}
+                    >
                       {patient.condition}
                     </Badge>
                   </div>
