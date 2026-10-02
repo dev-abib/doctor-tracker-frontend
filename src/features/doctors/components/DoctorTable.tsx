@@ -124,7 +124,7 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
           <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[220px]">
+                <TableHead className="min-w-55">
                   <button
                     type="button"
                     onClick={handleToggleNameSort}
@@ -142,7 +142,7 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                   </button>
                 </TableHead>
                 <TableHead className="whitespace-nowrap">Specialization</TableHead>
-                <TableHead className="min-w-[160px]">Hospital</TableHead>
+                <TableHead className="min-w-40">Hospital</TableHead>
                 <TableHead className="whitespace-nowrap">Contact</TableHead>
                 <TableHead className="text-center whitespace-nowrap">Patients</TableHead>
                 <TableHead className="whitespace-nowrap">
@@ -168,7 +168,7 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
             <TableBody>
               {doctors.map((doctor) => (
                 <TableRow key={doctor._id} className="group hover:bg-muted/30 transition-colors">
-                  <TableCell className="min-w-[220px]">
+                  <TableCell className="min-w-55">
                     <div className="flex items-center gap-3">
                       {doctor.image ? (
                         <img
@@ -213,10 +213,10 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                     </Badge>
                   </TableCell>
 
-                  <TableCell className="min-w-[160px]">
+                  <TableCell className="min-w-40">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                       <Building2 className="h-3.5 w-3.5 shrink-0" />
-                      <span className="truncate max-w-[180px]">{doctor.hospital}</span>
+                      <span className="truncate max-w-45">{doctor.hospital}</span>
                     </div>
                   </TableCell>
 

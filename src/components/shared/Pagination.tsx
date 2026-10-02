@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 key={idx}
                 variant={p === page ? "default" : "outline"}
                 size="sm"
-                className="h-8 min-w-[32px] px-2 rounded-lg text-xs"
+                className="h-8 min-w-8 px-2 rounded-lg text-xs"
                 onClick={() => onPageChange(p)}
                 disabled={isLoading}
               >

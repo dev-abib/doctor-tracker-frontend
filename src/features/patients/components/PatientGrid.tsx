@@ -168,7 +168,7 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
                         <button
                           type="button"
                           onClick={() => copyToClipboard(patient.email || "", "Email", `mail-${patient._id}`)}
-                          className="flex items-center gap-1 hover:text-primary transition-colors truncate max-w-[140px] cursor-pointer group/item"
+                          className="flex items-center gap-1 hover:text-primary transition-colors truncate max-w-35 cursor-pointer group/item"
                           title="Click to copy email"
                         >
                           <Mail className="h-3.5 w-3.5 shrink-0" />

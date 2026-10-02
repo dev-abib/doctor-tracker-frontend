@@ -37,7 +37,8 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const [selectedDoctorForDelete, setSelectedDoctorForDelete] = useState<Doctor | null>(null);
+  const [selectedDoctorForDelete, setSelectedDoctorForDelete] =
+    useState<Doctor | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -62,7 +63,7 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
           <div
             key={i}
             className="rounded-2xl border border-border/70 bg-card p-4 space-y-3.5 shadow-xs"
@@ -98,7 +99,7 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {doctors.map((doctor) => (
+        {doctors.map(doctor => (
           <div
             key={doctor._id}
             className="group relative flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-border"
@@ -131,7 +132,9 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
                       className="inline-flex items-center gap-1 text-[11px] font-medium py-0 px-2 h-5"
                     >
                       <Stethoscope className="h-2.5 w-2.5 shrink-0" />
-                      <span className="truncate max-w-[120px]">{doctor.specialization}</span>
+                      <span className="truncate max-w-30">
+                        {doctor.specialization}
+                      </span>
                     </Badge>
                   </div>
                 </div>
@@ -141,14 +144,22 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
               <div className="space-y-1.5 text-xs text-muted-foreground pt-1">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
-                  <span className="truncate font-medium text-foreground/80">{doctor.hospital}</span>
+                  <span className="truncate font-medium text-foreground/80">
+                    {doctor.hospital}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(doctor.email, "Email", `mail-${doctor._id}`)}
-                    className="flex items-center gap-1 hover:text-primary transition-colors truncate max-w-[150px] cursor-pointer group/item"
+                    onClick={() =>
+                      copyToClipboard(
+                        doctor.email,
+                        "Email",
+                        `mail-${doctor._id}`,
+                      )
+                    }
+                    className="flex items-center gap-1 hover:text-primary transition-colors truncate max-w-38 cursor-pointer group/item"
                     title="Click to copy email"
                   >
                     <Mail className="h-3.5 w-3.5 shrink-0" />
@@ -162,7 +173,13 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => copyToClipboard(doctor.phone, "Phone", `phone-${doctor._id}`)}
+                    onClick={() =>
+                      copyToClipboard(
+                        doctor.phone,
+                        "Phone",
+                        `phone-${doctor._id}`,
+                      )
+                    }
                     className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group/item text-right font-mono"
                     title="Click to copy phone"
                   >

@@ -52,7 +52,7 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[36px] bg-card shadow-[0_20px_70px_-15px_rgba(0,0,0,0.08)] border border-border/80 grid grid-cols-1 md:grid-cols-2">
+    <div className="w-full max-w-4xl overflow-hidden rounded-3xl sm:rounded-4xl md:rounded-[36px] bg-card shadow-[0_20px_70px_-15px_rgba(0,0,0,0.08)] border border-border/80 grid grid-cols-1 md:grid-cols-2">
       {/* Left Form Section */}
       <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14">
         <div>
@@ -78,7 +78,7 @@ export const LoginForm: React.FC = () => {
                 <input
                   type="email"
                   placeholder="admin@doctortracker.com"
-                  className="w-full h-[52px] rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
+                  className="w-full h-13 rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
                   {...register("email")}
                 />
                 <div className="absolute right-3.5 flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs">
@@ -98,7 +98,7 @@ export const LoginForm: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••••"
-                  className="w-full h-[52px] rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground tracking-wider outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
+                  className="w-full h-13 rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground tracking-wider outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
                   {...register("password")}
                 />
                 <button
@@ -135,7 +135,7 @@ export const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[52px] rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-all duration-200 shadow-md shadow-primary/25 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full h-13 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-all duration-200 shadow-md shadow-primary/25 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               {isSubmitting ? (
                 <>
@@ -170,7 +170,7 @@ export const LoginForm: React.FC = () => {
       </div>
 
       {/* Right Studio Visual Section */}
-      <div className="hidden md:block relative w-full h-full min-h-[480px] bg-muted">
+      <div className="hidden md:block relative w-full h-full min-h-120 bg-muted">
         <img
           src="/images/studio_desk.jpg"
           alt="Studio Workspace"

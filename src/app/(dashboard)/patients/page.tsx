@@ -411,7 +411,7 @@ export default function PatientsPage() {
       <div className="rounded-2xl border border-border/80 bg-card p-2.5 shadow-xs">
         <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
           {/* Search Bar */}
-          <div className="flex-1 min-w-[240px]">
+          <div className="flex-1 min-w-60">
             <SearchInput
               value={search}
               onChange={handleSearchChange}
@@ -500,7 +500,7 @@ export default function PatientsPage() {
                 { label: "Age (Youngest)", value: "age_asc" },
                 { label: "Age (Oldest)", value: "age_desc" },
               ]}
-              className="w-auto min-w-[120px]"
+              className="w-auto min-w-30"
             />
 
             {/* Reset Filters button */}

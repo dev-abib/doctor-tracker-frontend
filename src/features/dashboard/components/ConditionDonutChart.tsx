@@ -105,7 +105,7 @@ export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) =
         </div>
 
         {/* Structured Custom Legend Grid with Visible Smooth Scrollbar */}
-        <div className="flex-1 w-full h-[215px] overflow-y-auto space-y-1.5 pr-2 scrollbar-visible">
+        <div className="flex-1 w-full h-54 overflow-y-auto space-y-1.5 pr-2 scrollbar-visible">
           {data.map((item, index) => {
             const color = DONUT_COLORS[index % DONUT_COLORS.length];
             const pct =
@@ -137,7 +137,7 @@ export const ConditionDonutChart: React.FC<Props> = ({ data = [], isLoading }) =
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="font-semibold text-foreground">{item.count}</span>
-                  <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md min-w-[34px] text-center">
+                  <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md min-w-9 text-center">
                     {pct}
                   </span>
                 </div>

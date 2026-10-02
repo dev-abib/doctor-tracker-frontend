@@ -218,7 +218,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 )}
                 <span className="absolute bottom-0 right-0 h-1.5 w-1.5 rounded-full bg-emerald-500 ring-1 ring-card" />
               </div>
-              <div className="hidden sm:flex flex-col text-left max-w-[130px]">
+              <div className="hidden sm:flex flex-col text-left max-w-36">
                 <span className="truncate text-xs font-bold text-foreground leading-tight">
                   {user?.name || "Dr. Administrator"}
                 </span>

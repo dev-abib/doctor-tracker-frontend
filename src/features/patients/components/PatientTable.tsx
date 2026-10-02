@@ -128,7 +128,7 @@ export const PatientTable: React.FC<Props> = ({
           <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[200px]">
+                <TableHead className="min-w-50">
                   <button
                     type="button"
                     onClick={handleToggleNameSort}
@@ -163,7 +163,7 @@ export const PatientTable: React.FC<Props> = ({
                   </button>
                 </TableHead>
                 <TableHead className="whitespace-nowrap">Condition</TableHead>
-                <TableHead className="min-w-[170px]">Attending Doctor</TableHead>
+                <TableHead className="min-w-44">Attending Doctor</TableHead>
                 <TableHead className="whitespace-nowrap">Contact</TableHead>
                 <TableHead className="whitespace-nowrap">
                   <button
@@ -191,7 +191,7 @@ export const PatientTable: React.FC<Props> = ({
 
                 return (
                   <TableRow key={patient._id} className="group hover:bg-muted/30 transition-colors">
-                    <TableCell className="min-w-[200px]">
+                    <TableCell className="min-w-50">
                       <div className="flex items-center gap-3">
                         {patient.image ? (
                           <img
@@ -245,19 +245,19 @@ export const PatientTable: React.FC<Props> = ({
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="min-w-[170px]">
+                    <TableCell className="min-w-44">
                       {docObj ? (
                         <Link
                           href={`/doctors/${docObj._id}`}
                           className="flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-primary transition-colors group/doc"
                         >
                           <Stethoscope className="h-3.5 w-3.5 text-primary shrink-0 group-hover/doc:scale-110 transition-transform" />
-                          <span className="truncate max-w-[160px]">{docObj.name}</span>
+                          <span className="truncate max-w-40">{docObj.name}</span>
                         </Link>
                       ) : (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Stethoscope className="h-3.5 w-3.5 shrink-0 opacity-50" />
-                          <span className="truncate max-w-[160px]">
+                          <span className="truncate max-w-40">
                             {typeof patient.doctor === "string" ? patient.doctor : "Unassigned"}
                           </span>
                         </div>

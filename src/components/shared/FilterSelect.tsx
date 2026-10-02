@@ -119,7 +119,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
       {isOpen && (
         <div
           className={cn(
-            "absolute z-50 mt-1.5 min-w-[200px] max-w-[280px] rounded-2xl border border-border/80 bg-card/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in-0 zoom-in-95 duration-150",
+            "absolute z-50 mt-1.5 min-w-50 max-w-70 rounded-2xl border border-border/80 bg-card/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in-0 zoom-in-95 duration-150",
             align === "right" ? "right-0" : "left-0"
           )}
           role="listbox"

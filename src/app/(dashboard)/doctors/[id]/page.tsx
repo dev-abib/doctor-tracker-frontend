@@ -177,7 +177,7 @@ export default function DoctorDetailPage() {
               <Table className="min-w-[750px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[200px]">Patient Name</TableHead>
+                    <TableHead className="min-w-50">Patient Name</TableHead>
                     <TableHead className="whitespace-nowrap">Demographics</TableHead>
                     <TableHead className="whitespace-nowrap">Condition</TableHead>
                     <TableHead className="whitespace-nowrap">Contact Phone</TableHead>
@@ -188,7 +188,7 @@ export default function DoctorDetailPage() {
                 <TableBody>
                   {patientsData?.patients.map((patient) => (
                     <TableRow key={patient._id}>
-                      <TableCell className="font-bold text-foreground min-w-[200px]">
+                      <TableCell className="font-bold text-foreground min-w-50">
                         <div className="flex items-center gap-2.5">
                           {patient.image ? (
                             <img
