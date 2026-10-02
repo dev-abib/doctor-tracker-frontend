@@ -64,6 +64,4 @@ export function getConditionBadgeVariant(condition: string): "default" | "destru
 
 export const SWAGGER_DOCS_URL =
   process.env.NEXT_PUBLIC_API_DOCS_URL ||
-  (process.env.NEXT_PUBLIC_API_URL
-    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "/api/docs")
-    : "https://doctor-tracker-server-pearl.vercel.app/api/docs");
+  "https://doctor-tracker-server-pearl.vercel.app/api/docs";
