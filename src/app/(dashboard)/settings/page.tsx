@@ -227,44 +227,53 @@ export default function SettingsPage() {
       />
 
       {/* Modern Segmented Tab Navigation */}
-      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-muted/50 border border-border/60 w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
+      <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 rounded-2xl bg-muted/50 border border-border/60 w-full sm:w-fit max-w-lg">
         <button
           type="button"
           onClick={() => setActiveTab("profile")}
-          className={`shrink-0 whitespace-nowrap flex items-center justify-center gap-2 py-2 px-3.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-1.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "profile"
               ? "bg-card text-foreground shadow-xs border border-border/70"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <User className="h-4 w-4 shrink-0" />
-          <span>Profile Details</span>
+          <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="truncate">
+            <span className="inline sm:hidden">Profile</span>
+            <span className="hidden sm:inline">Profile Details</span>
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("security")}
-          className={`shrink-0 whitespace-nowrap flex items-center justify-center gap-2 py-2 px-3.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-1.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "security"
               ? "bg-card text-foreground shadow-xs border border-border/70"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <Lock className="h-4 w-4 shrink-0" />
-          <span>Security & Auth</span>
+          <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="truncate">
+            <span className="inline sm:hidden">Security</span>
+            <span className="hidden sm:inline">Security & Auth</span>
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("cloud")}
-          className={`shrink-0 whitespace-nowrap flex items-center justify-center gap-2 py-2 px-3.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-1.5 sm:px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "cloud"
               ? "bg-card text-foreground shadow-xs border border-border/70"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <Cloud className="h-4 w-4 shrink-0" />
-          <span>Cloud CDN</span>
+          <Cloud className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="truncate">
+            <span className="inline sm:hidden">Cloud</span>
+            <span className="hidden sm:inline">Cloud CDN</span>
+          </span>
         </button>
       </div>
 

@@ -91,7 +91,7 @@ export const Topbar: React.FC<TopbarProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setIsSearchOpen((prev) => !prev);
+        setIsSearchOpen(prev => !prev);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -203,7 +203,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              onClick={() => setIsDropdownOpen(prev => !prev)}
               className="flex items-center gap-2 rounded-xl bg-muted/50 p-1 sm:pl-1.5 sm:pr-2.5 sm:py-1 border border-border/60 shadow-2xs shrink-0 hover:border-primary/40 transition-all cursor-pointer"
               aria-label="User Profile Menu"
             >

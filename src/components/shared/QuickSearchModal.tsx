@@ -65,13 +65,13 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
     { label: "Doctors Directory", href: "/doctors", icon: Stethoscope },
     { label: "Patient Records", href: "/patients", icon: Users },
     { label: "Admin Settings", href: "/settings", icon: Settings },
-  ].filter((p) =>
-    query ? p.label.toLowerCase().includes(query.toLowerCase()) : true
+  ].filter(p =>
+    query ? p.label.toLowerCase().includes(query.toLowerCase()) : true,
   );
 
   // Flatten searchable list for unified keyboard navigation
   const allItems = [
-    ...doctors.map((d) => ({
+    ...doctors.map(d => ({
       type: "doctor" as const,
       id: d._id,
       title: d.name,
@@ -80,7 +80,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
       image: d.image,
       icon: Stethoscope,
     })),
-    ...patients.map((p) => {
+    ...patients.map(p => {
       const docObj = typeof p.doctor === "object" ? p.doctor : null;
       return {
         type: "patient" as const,
@@ -93,7 +93,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         icon: User,
       };
     }),
-    ...pages.map((pg) => ({
+    ...pages.map(pg => ({
       type: "page" as const,
       id: pg.href,
       title: pg.label,
@@ -113,10 +113,14 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         onClose();
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (allItems.length ? (prev + 1) % allItems.length : 0));
+        setSelectedIndex(prev =>
+          allItems.length ? (prev + 1) % allItems.length : 0,
+        );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((prev) => (allItems.length ? (prev - 1 + allItems.length) % allItems.length : 0));
+        setSelectedIndex(prev =>
+          allItems.length ? (prev - 1 + allItems.length) % allItems.length : 0,
+        );
       } else if (e.key === "Enter" && allItems.length > 0) {
         e.preventDefault();
         const selected = allItems[selectedIndex];
@@ -159,7 +163,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             placeholder="Search doctors, patients, diagnosis, departments..."
             className="flex-1 bg-transparent text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 outline-none"
           />
@@ -185,8 +189,10 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                 Doctors ({doctors.length})
               </p>
               <div className="space-y-1">
-                {doctors.map((doc) => {
-                  const globalIdx = allItems.findIndex((item) => item.id === doc._id);
+                {doctors.map(doc => {
+                  const globalIdx = allItems.findIndex(
+                    item => item.id === doc._id,
+                  );
                   const isSelected = globalIdx === selectedIndex;
                   return (
                     <button
@@ -212,15 +218,20 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                           </div>
                         )}
                         <div className="truncate">
-                          <p className={`text-xs font-bold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-900 dark:text-white"}`}>
+                          <p
+                            className={`text-xs font-bold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-900 dark:text-white"}`}
+                          >
                             {doc.name}
                           </p>
                           <p className="text-[11px] text-slate-400">
-                            {doc.specialization} • {doc.patientCount ?? 0} patients
+                            {doc.specialization} • {doc.patientCount ?? 0}{" "}
+                            patients
                           </p>
                         </div>
                       </div>
-                      <ArrowRight className={`h-4 w-4 text-slate-400 transition-all shrink-0 ${isSelected ? "opacity-100 translate-x-0.5 text-[#5046e5]" : "opacity-0"}`} />
+                      <ArrowRight
+                        className={`h-4 w-4 text-slate-400 transition-all shrink-0 ${isSelected ? "opacity-100 translate-x-0.5 text-[#5046e5]" : "opacity-0"}`}
+                      />
                     </button>
                   );
                 })}
@@ -235,16 +246,20 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                 Patients ({patients.length})
               </p>
               <div className="space-y-1">
-                {patients.map((patient) => {
+                {patients.map(patient => {
                   const docObj =
                     typeof patient.doctor === "object" ? patient.doctor : null;
-                  const globalIdx = allItems.findIndex((item) => item.id === patient._id);
+                  const globalIdx = allItems.findIndex(
+                    item => item.id === patient._id,
+                  );
                   const isSelected = globalIdx === selectedIndex;
                   return (
                     <button
                       key={patient._id}
                       onClick={() =>
-                        navigateTo(`/patients?search=${encodeURIComponent(patient.name)}`)
+                        navigateTo(
+                          `/patients?search=${encodeURIComponent(patient.name)}`,
+                        )
                       }
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
                       className={`flex w-full items-center justify-between p-2.5 rounded-xl transition-all text-left group cursor-pointer ${
@@ -266,7 +281,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                           </div>
                         )}
                         <div className="truncate">
-                          <p className={`text-xs font-bold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-900 dark:text-white"}`}>
+                          <p
+                            className={`text-xs font-bold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-900 dark:text-white"}`}
+                          >
                             {patient.name}
                           </p>
                           <p className="text-[11px] text-slate-400">
@@ -278,7 +295,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                         </div>
                       </div>
                       <span className="text-[10px] font-medium text-slate-400 shrink-0">
-                        {docObj?.name ? `Dr. ${docObj.name.replace("Dr. ", "")}` : ""}
+                        {docObj?.name
+                          ? `Dr. ${docObj.name.replace("Dr. ", "")}`
+                          : ""}
                       </span>
                     </button>
                   );
@@ -294,9 +313,11 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                 Navigation
               </p>
               <div className="space-y-1">
-                {pages.map((p) => {
+                {pages.map(p => {
                   const Icon = p.icon;
-                  const globalIdx = allItems.findIndex((item) => item.id === p.href);
+                  const globalIdx = allItems.findIndex(
+                    item => item.id === p.href,
+                  );
                   const isSelected = globalIdx === selectedIndex;
                   return (
                     <button
@@ -313,7 +334,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                           <Icon className="h-4 w-4" />
                         </div>
-                        <span className={`text-xs font-semibold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-800 dark:text-slate-200"}`}>
+                        <span
+                          className={`text-xs font-semibold transition-colors ${isSelected ? "text-[#5046e5] dark:text-indigo-400" : "text-slate-800 dark:text-slate-200"}`}
+                        >
                           {p.label}
                         </span>
                       </div>
@@ -356,7 +379,8 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                   No matches found for &ldquo;{query}&rdquo;
                 </p>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Try searching by doctor name, medical specialty, or patient diagnosis.
+                  Try searching by doctor name, medical specialty, or patient
+                  diagnosis.
                 </p>
               </div>
             )}
@@ -384,7 +408,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
               to close
             </span>
           </div>
-          <span className="font-medium text-[#5046e5]">Doctor Tracker Core</span>
+          <span className="font-medium text-[#5046e5]">
+            Doctor Tracker Core
+          </span>
         </div>
       </div>
     </div>
