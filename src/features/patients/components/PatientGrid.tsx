@@ -34,7 +34,8 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const [selectedPatientForDelete, setSelectedPatientForDelete] = useState<Patient | null>(null);
+  const [selectedPatientForDelete, setSelectedPatientForDelete] =
+    useState<Patient | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -59,7 +60,7 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
           <div
             key={i}
             className="rounded-2xl border border-border/70 bg-card p-4 space-y-3.5 shadow-xs"
@@ -95,9 +96,16 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {patients.map((patient) => {
-          const doctorObj = typeof patient.doctor === "object" && patient.doctor !== null ? patient.doctor : null;
-          const doctorName = doctorObj ? doctorObj.name : typeof patient.doctor === "string" ? patient.doctor : null;
+        {patients.map(patient => {
+          const doctorObj =
+            typeof patient.doctor === "object" && patient.doctor !== null
+              ? patient.doctor
+              : null;
+          const doctorName = doctorObj
+            ? doctorObj.name
+            : typeof patient.doctor === "string"
+              ? patient.doctor
+              : null;
 
           return (
             <div
@@ -156,7 +164,9 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
                           {doctorName}
                         </Link>
                       ) : (
-                        <span className="truncate font-medium text-foreground">{doctorName}</span>
+                        <span className="truncate font-medium text-foreground">
+                          {doctorName}
+                        </span>
                       )}
                     </div>
                   )}
@@ -167,7 +177,13 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
                       {patient.email ? (
                         <button
                           type="button"
-                          onClick={() => copyToClipboard(patient.email || "", "Email", `mail-${patient._id}`)}
+                          onClick={() =>
+                            copyToClipboard(
+                              patient.email || "",
+                              "Email",
+                              `mail-${patient._id}`,
+                            )
+                          }
                           className="flex items-center gap-1 hover:text-primary transition-colors truncate max-w-35 cursor-pointer group/item"
                           title="Click to copy email"
                         >
@@ -180,12 +196,20 @@ export const PatientGrid: React.FC<PatientGridProps> = ({
                           )}
                         </button>
                       ) : (
-                        <span className="text-muted-foreground/60 italic text-[11px]">No email</span>
+                        <span className="text-muted-foreground/60 italic text-[11px]">
+                          No email
+                        </span>
                       )}
 
                       <button
                         type="button"
-                        onClick={() => copyToClipboard(patient.phone, "Phone", `phone-${patient._id}`)}
+                        onClick={() =>
+                          copyToClipboard(
+                            patient.phone,
+                            "Phone",
+                            `phone-${patient._id}`,
+                          )
+                        }
                         className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer group/item text-right font-mono"
                         title="Click to copy phone"
                       >

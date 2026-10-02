@@ -163,7 +163,7 @@ export const PatientTable: React.FC<Props> = ({
                   </button>
                 </TableHead>
                 <TableHead className="whitespace-nowrap">Condition</TableHead>
-                <TableHead className="min-w-44">Attending Doctor</TableHead>
+                <TableHead className="min-w-42.5">Attending Doctor</TableHead>
                 <TableHead className="whitespace-nowrap">Contact</TableHead>
                 <TableHead className="whitespace-nowrap">
                   <button
