@@ -96,7 +96,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={plusJakartaSans.variable}>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <QueryProvider>
             <AuthProvider>
               {children}
@@ -104,7 +104,6 @@ export default function RootLayout({
                 position="top-right"
                 richColors
                 closeButton
-                theme="system"
               />
             </AuthProvider>
           </QueryProvider>
