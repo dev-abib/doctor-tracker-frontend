@@ -50,7 +50,8 @@ export const PatientTable: React.FC<Props> = ({
   sort,
   onSortChange,
 }) => {
-  const [selectedPatientForDelete, setSelectedPatientForDelete] = useState<Patient | null>(null);
+  const [selectedPatientForDelete, setSelectedPatientForDelete] =
+    useState<Patient | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -93,8 +94,11 @@ export const PatientTable: React.FC<Props> = ({
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-border/80 bg-card p-4 space-y-3">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="flex items-center justify-between gap-4 py-3 px-2 border-b border-border/40">
+        {[1, 2, 3, 4, 5, 6].map(i => (
+          <div
+            key={i}
+            className="flex items-center justify-between gap-4 py-3 px-2 border-b border-border/40"
+          >
             <div className="flex items-center gap-3">
               <Skeleton className="h-10 w-10 rounded-xl" />
               <div className="space-y-1.5">
@@ -125,7 +129,7 @@ export const PatientTable: React.FC<Props> = ({
       <div className="w-full">
         {/* Desktop / Tablet Table */}
         <div className="hidden md:block overflow-x-auto rounded-2xl border border-border/80 bg-card shadow-xs">
-          <Table className="min-w-[850px]">
+          <Table className="min-w-212.5">
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-50">
@@ -182,15 +186,21 @@ export const PatientTable: React.FC<Props> = ({
                     )}
                   </button>
                 </TableHead>
-                <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
+                <TableHead className="text-right whitespace-nowrap">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {patients.map((patient) => {
-                const docObj = typeof patient.doctor === "object" ? patient.doctor : null;
+              {patients.map(patient => {
+                const docObj =
+                  typeof patient.doctor === "object" ? patient.doctor : null;
 
                 return (
-                  <TableRow key={patient._id} className="group hover:bg-muted/30 transition-colors">
+                  <TableRow
+                    key={patient._id}
+                    className="group hover:bg-muted/30 transition-colors"
+                  >
                     <TableCell className="min-w-50">
                       <div className="flex items-center gap-3">
                         {patient.image ? (
@@ -211,7 +221,13 @@ export const PatientTable: React.FC<Props> = ({
                           {patient.email ? (
                             <button
                               type="button"
-                              onClick={() => copyToClipboard(patient.email || "", "Email", `email-${patient._id}`)}
+                              onClick={() =>
+                                copyToClipboard(
+                                  patient.email || "",
+                                  "Email",
+                                  `email-${patient._id}`,
+                                )
+                              }
                               className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 truncate text-left cursor-pointer transition-colors group/mail"
                               title="Click to copy email"
                             >
@@ -224,7 +240,9 @@ export const PatientTable: React.FC<Props> = ({
                               )}
                             </button>
                           ) : (
-                            <span className="text-xs text-muted-foreground/60 italic">No email</span>
+                            <span className="text-xs text-muted-foreground/60 italic">
+                              No email
+                            </span>
                           )}
                         </div>
                       </div>
@@ -235,12 +253,17 @@ export const PatientTable: React.FC<Props> = ({
                         <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <span>{patient.age} yrs</span>
                         <span className="text-border mx-0.5">•</span>
-                        <span className="text-muted-foreground font-normal">{patient.gender}</span>
+                        <span className="text-muted-foreground font-normal">
+                          {patient.gender}
+                        </span>
                       </div>
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap">
-                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-medium">
+                      <Badge
+                        variant={getConditionBadgeVariant(patient.condition)}
+                        className="font-medium"
+                      >
                         {patient.condition}
                       </Badge>
                     </TableCell>
@@ -252,13 +275,17 @@ export const PatientTable: React.FC<Props> = ({
                           className="flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-primary transition-colors group/doc"
                         >
                           <Stethoscope className="h-3.5 w-3.5 text-primary shrink-0 group-hover/doc:scale-110 transition-transform" />
-                          <span className="truncate max-w-40">{docObj.name}</span>
+                          <span className="truncate max-w-40">
+                            {docObj.name}
+                          </span>
                         </Link>
                       ) : (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Stethoscope className="h-3.5 w-3.5 shrink-0 opacity-50" />
                           <span className="truncate max-w-40">
-                            {typeof patient.doctor === "string" ? patient.doctor : "Unassigned"}
+                            {typeof patient.doctor === "string"
+                              ? patient.doctor
+                              : "Unassigned"}
                           </span>
                         </div>
                       )}
@@ -267,12 +294,20 @@ export const PatientTable: React.FC<Props> = ({
                     <TableCell className="whitespace-nowrap">
                       <button
                         type="button"
-                        onClick={() => copyToClipboard(patient.phone, "Phone number", `phone-${patient._id}`)}
+                        onClick={() =>
+                          copyToClipboard(
+                            patient.phone,
+                            "Phone number",
+                            `phone-${patient._id}`,
+                          )
+                        }
                         className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors group/ph whitespace-nowrap"
                         title="Click to copy phone number"
                       >
                         <Phone className="h-3 w-3 shrink-0 group-hover/ph:text-primary transition-colors" />
-                        <span className="font-mono whitespace-nowrap">{patient.phone}</span>
+                        <span className="font-mono whitespace-nowrap">
+                          {patient.phone}
+                        </span>
                         {copiedId === `phone-${patient._id}` ? (
                           <Check className="h-2.5 w-2.5 text-emerald-500 shrink-0 ml-0.5" />
                         ) : (
@@ -284,7 +319,9 @@ export const PatientTable: React.FC<Props> = ({
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span>{formatDate(patient.visitDate || patient.createdAt)}</span>
+                        <span>
+                          {formatDate(patient.visitDate || patient.createdAt)}
+                        </span>
                       </div>
                     </TableCell>
 
@@ -319,8 +356,9 @@ export const PatientTable: React.FC<Props> = ({
 
         {/* Mobile Cards View */}
         <div className="grid grid-cols-1 gap-3 md:hidden">
-          {patients.map((patient) => {
-            const docObj = typeof patient.doctor === "object" ? patient.doctor : null;
+          {patients.map(patient => {
+            const docObj =
+              typeof patient.doctor === "object" ? patient.doctor : null;
 
             return (
               <div
@@ -341,13 +379,18 @@ export const PatientTable: React.FC<Props> = ({
                       </div>
                     )}
                     <div>
-                      <p className="font-bold text-sm text-foreground">{patient.name}</p>
+                      <p className="font-bold text-sm text-foreground">
+                        {patient.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {patient.age} yrs • {patient.gender}
                       </p>
                     </div>
                   </div>
-                  <Badge variant={getConditionBadgeVariant(patient.condition)} className="text-[11px]">
+                  <Badge
+                    variant={getConditionBadgeVariant(patient.condition)}
+                    className="text-[11px]"
+                  >
                     {patient.condition}
                   </Badge>
                 </div>
@@ -356,7 +399,12 @@ export const PatientTable: React.FC<Props> = ({
                   <div className="flex items-center gap-1.5">
                     <Stethoscope className="h-3.5 w-3.5 text-primary" />
                     <span>
-                      Attending: {docObj ? docObj.name : typeof patient.doctor === "string" ? patient.doctor : "None"}
+                      Attending:{" "}
+                      {docObj
+                        ? docObj.name
+                        : typeof patient.doctor === "string"
+                          ? patient.doctor
+                          : "None"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -366,7 +414,9 @@ export const PatientTable: React.FC<Props> = ({
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
-                      <span>{formatDate(patient.visitDate || patient.createdAt)}</span>
+                      <span>
+                        {formatDate(patient.visitDate || patient.createdAt)}
+                      </span>
                     </div>
                   </div>
                 </div>
