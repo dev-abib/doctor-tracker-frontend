@@ -8,12 +8,17 @@ import {
   Phone,
   Mail,
   Users,
-  MoreVertical,
   Pencil,
   Trash2,
   Eye,
   Calendar,
+  Copy,
+  Check,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -27,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { Doctor } from "@/types/api";
 
 interface DoctorTableProps {
@@ -35,6 +40,8 @@ interface DoctorTableProps {
   isLoading: boolean;
   onEdit: (doctor: Doctor) => void;
   onDelete: (id: string) => Promise<any>;
+  sort?: string;
+  onSortChange?: (newSort: string) => void;
 }
 
 export const DoctorTable: React.FC<DoctorTableProps> = ({
@@ -42,9 +49,19 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
   isLoading,
   onEdit,
   onDelete,
+  sort,
+  onSortChange,
 }) => {
   const [selectedDoctorForDelete, setSelectedDoctorForDelete] = useState<Doctor | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, label: string, uniqueKey: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(uniqueKey);
+    toast.success(`${label} copied to clipboard`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleDeleteConfirm = async () => {
     if (!selectedDoctorForDelete) return;
@@ -55,6 +72,18 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleToggleNameSort = () => {
+    if (!onSortChange) return;
+    if (sort === "name_asc") onSortChange("name_desc");
+    else onSortChange("name_asc");
+  };
+
+  const handleToggleDateSort = () => {
+    if (!onSortChange) return;
+    if (sort === "newest") onSortChange("oldest");
+    else onSortChange("newest");
   };
 
   if (isLoading) {
@@ -95,18 +124,50 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
           <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[220px]">Doctor</TableHead>
+                <TableHead className="min-w-[220px]">
+                  <button
+                    type="button"
+                    onClick={handleToggleNameSort}
+                    className="inline-flex items-center gap-1.5 font-bold hover:text-foreground transition-colors cursor-pointer text-xs"
+                    title="Sort by doctor name"
+                  >
+                    <span>Doctor</span>
+                    {sort === "name_asc" ? (
+                      <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : sort === "name_desc" ? (
+                      <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 opacity-40 hover:opacity-100" />
+                    )}
+                  </button>
+                </TableHead>
                 <TableHead className="whitespace-nowrap">Specialization</TableHead>
                 <TableHead className="min-w-[160px]">Hospital</TableHead>
                 <TableHead className="whitespace-nowrap">Contact</TableHead>
                 <TableHead className="text-center whitespace-nowrap">Patients</TableHead>
-                <TableHead className="whitespace-nowrap">Joined</TableHead>
+                <TableHead className="whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={handleToggleDateSort}
+                    className="inline-flex items-center gap-1.5 font-bold hover:text-foreground transition-colors cursor-pointer text-xs"
+                    title="Sort by registration date"
+                  >
+                    <span>Joined</span>
+                    {sort === "newest" ? (
+                      <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : sort === "oldest" ? (
+                      <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 opacity-40 hover:opacity-100" />
+                    )}
+                  </button>
+                </TableHead>
                 <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {doctors.map((doctor) => (
-                <TableRow key={doctor._id} className="group">
+                <TableRow key={doctor._id} className="group hover:bg-muted/30 transition-colors">
                   <TableCell className="min-w-[220px]">
                     <div className="flex items-center gap-3">
                       {doctor.image ? (
@@ -116,8 +177,8 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                           className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                          {doctor.name.replace("Dr. ", "").charAt(0)}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                          {(doctor.name || "D").replace("Dr. ", "").charAt(0)}
                         </div>
                       )}
                       <div className="min-w-0">
@@ -127,10 +188,20 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                         >
                           {doctor.name}
                         </Link>
-                        <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(doctor.email, "Email", `email-${doctor._id}`)}
+                          className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 truncate text-left cursor-pointer transition-colors group/mail"
+                          title="Click to copy email"
+                        >
                           <Mail className="h-3 w-3 shrink-0" />
                           <span className="truncate">{doctor.email}</span>
-                        </span>
+                          {copiedId === `email-${doctor._id}` ? (
+                            <Check className="h-2.5 w-2.5 text-emerald-500 shrink-0 ml-0.5" />
+                          ) : (
+                            <Copy className="h-2.5 w-2.5 opacity-0 group-hover/mail:opacity-100 shrink-0 ml-0.5 transition-opacity" />
+                          )}
+                        </button>
                       </div>
                     </div>
                   </TableCell>
@@ -150,10 +221,20 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                   </TableCell>
 
                   <TableCell className="whitespace-nowrap">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
-                      <Phone className="h-3 w-3 shrink-0" />
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(doctor.phone, "Phone number", `phone-${doctor._id}`)}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors group/ph whitespace-nowrap"
+                      title="Click to copy phone number"
+                    >
+                      <Phone className="h-3 w-3 shrink-0 group-hover/ph:text-primary transition-colors" />
                       <span className="font-mono whitespace-nowrap">{doctor.phone}</span>
-                    </div>
+                      {copiedId === `phone-${doctor._id}` ? (
+                        <Check className="h-2.5 w-2.5 text-emerald-500 shrink-0 ml-0.5" />
+                      ) : (
+                        <Copy className="h-2.5 w-2.5 opacity-0 group-hover/ph:opacity-100 shrink-0 ml-0.5 transition-opacity" />
+                      )}
+                    </button>
                   </TableCell>
 
                   <TableCell className="text-center whitespace-nowrap">
@@ -221,8 +302,8 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({
                       className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-sm">
-                      {doctor.name.replace("Dr. ", "").charAt(0)}
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                      {(doctor.name || "D").replace("Dr. ", "").charAt(0)}
                     </div>
                   )}
                   <div>

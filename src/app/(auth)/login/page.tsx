@@ -1,5 +1,11 @@
 import React from "react";
+import type { Metadata } from "next";
 import { LoginForm } from "@/features/auth/components/LoginForm";
+
+export const metadata: Metadata = {
+  title: "Practitioner Sign In",
+  description: "Sign in to DoctorTracker Administrator Portal with secure JWT authentication.",
+};
 
 export default function LoginPage() {
   return (

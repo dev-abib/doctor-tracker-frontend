@@ -2,14 +2,34 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Plus, X, Calendar, RotateCcw } from "lucide-react";
+import {
+  Plus,
+  X,
+  Calendar,
+  RotateCcw,
+  Download,
+  Stethoscope,
+  User,
+  ArrowUpDown,
+  Layers,
+  LayoutGrid,
+  List,
+  Users,
+  HeartPulse,
+  Activity,
+  ShieldCheck,
+  Building2,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SearchInput } from "@/components/shared/SearchInput";
+import { SmartCategoryTabs, CategoryGroup } from "@/components/shared/SmartCategoryTabs";
+import { DirectoryKpiStrip } from "@/components/shared/DirectoryKpiStrip";
 import { Pagination } from "@/components/shared/Pagination";
+import { FilterSelect } from "@/components/shared/FilterSelect";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { PatientTable } from "@/features/patients/components/PatientTable";
+import { PatientGrid } from "@/features/patients/components/PatientGrid";
 import {
   PatientFormModal,
   PatientFormData,
@@ -22,6 +42,7 @@ import {
   useDeletePatient,
 } from "@/features/patients/hooks/usePatients";
 import { Patient } from "@/types/api";
+import { cn } from "@/lib/utils";
 
 export default function PatientsPage() {
   const router = useRouter();
@@ -39,6 +60,7 @@ export default function PatientsPage() {
   const sortParam = searchParams.get("sort") || "newest";
 
   const [page, setPage] = useState(pageParam);
+  const [limit] = useState(12);
   const [search, setSearch] = useState(searchParam);
   const [condition, setCondition] = useState(conditionParam);
   const [doctor, setDoctor] = useState(doctorParam);
@@ -46,6 +68,21 @@ export default function PatientsPage() {
   const [startDate, setStartDate] = useState(startDateParam);
   const [endDate, setEndDate] = useState(endDateParam);
   const [sort, setSort] = useState(sortParam);
+
+  // View mode state
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("doctor_tracker_patients_view");
+    if (saved === "grid" || saved === "table") {
+      setViewMode(saved);
+    }
+  }, []);
+
+  const handleViewModeChange = (mode: "table" | "grid") => {
+    setViewMode(mode);
+    localStorage.setItem("doctor_tracker_patients_view", mode);
+  };
 
   // Derive date preset
   const getDatePreset = () => {
@@ -88,7 +125,7 @@ export default function PatientsPage() {
     [pathname, router, searchParams]
   );
 
-  // Sync state with URL params on navigation (e.g. browser back/forward)
+  // Sync state with URL params on navigation
   useEffect(() => {
     setPage(pageParam);
     setSearch(searchParam);
@@ -114,7 +151,7 @@ export default function PatientsPage() {
   const { data: filtersData } = usePatientFilters();
   const { data, isLoading } = usePatientsList({
     page,
-    limit: 10,
+    limit,
     search,
     condition,
     doctor,
@@ -137,6 +174,13 @@ export default function PatientsPage() {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     updateUrlParams({ page: newPage });
+  };
+
+  const handleConditionClick = (cond: string) => {
+    const newVal = condition === cond ? "" : cond;
+    setCondition(newVal);
+    setPage(1);
+    updateUrlParams({ condition: newVal || undefined, page: 1 });
   };
 
   const handleDatePresetChange = (preset: string) => {
@@ -191,6 +235,40 @@ export default function PatientsPage() {
     router.replace(pathname, { scroll: false });
   };
 
+  const handleExportCsv = () => {
+    const list = data?.patients || [];
+    if (list.length === 0) return;
+
+    const escapeCsv = (val: any) => `"${String(val ?? "").replace(/"/g, '""')}"`;
+    const headers = ["ID", "Name", "Age", "Gender", "Condition", "Doctor", "Phone", "Email", "Visit Date"];
+    const rows = list.map((p) => {
+      const docName = typeof p.doctor === "object" && p.doctor ? p.doctor.name : String(p.doctor || "N/A");
+      return [
+        escapeCsv(p._id),
+        escapeCsv(p.name),
+        p.age,
+        escapeCsv(p.gender),
+        escapeCsv(p.condition),
+        escapeCsv(docName),
+        escapeCsv(p.phone),
+        escapeCsv(p.email || ""),
+        escapeCsv(new Date(p.visitDate || p.createdAt).toLocaleDateString()),
+      ];
+    });
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `patients_export_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleCreateSubmit = async (formData: PatientFormData) => {
     await createPatientMutation.mutateAsync({
       name: formData.name,
@@ -226,143 +304,256 @@ export default function PatientsPage() {
     await deletePatientMutation.mutateAsync(id);
   };
 
-  const hasActiveFilters = !!(
-    search ||
-    condition ||
-    doctor ||
-    gender ||
-    startDate ||
-    endDate ||
-    sort !== "newest"
-  );
+  const activeFiltersCount = [
+    Boolean(search),
+    Boolean(condition),
+    Boolean(doctor),
+    Boolean(gender),
+    Boolean(startDate || endDate),
+    sort !== "newest",
+  ].filter(Boolean).length;
 
+  const hasActiveFilters = activeFiltersCount > 0;
   const selectedDoctorObj = filtersData?.doctors.find((d) => d._id === doctor);
 
   const headerAction = (
-    <Button
-      variant="gradient"
-      size="sm"
-      className="rounded-xl h-9 font-semibold"
-      onClick={() => setIsCreateModalOpen(true)}
-    >
-      <Plus className="h-4 w-4 mr-1.5" />
-      Register Patient
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        className="rounded-xl h-9 font-semibold text-xs gap-1.5"
+        onClick={handleExportCsv}
+        disabled={isLoading || (data?.patients || []).length === 0}
+        title="Export filtered patients list to CSV"
+      >
+        <Download className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="hidden sm:inline">Export CSV</span>
+      </Button>
+      <Button
+        variant="default"
+        size="sm"
+        className="rounded-xl h-9 font-semibold text-xs gap-1.5 shadow-xs shadow-primary/20"
+        onClick={() => setIsCreateModalOpen(true)}
+      >
+        <Plus className="h-4 w-4" />
+        <span>Register Patient</span>
+      </Button>
+    </div>
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       <PageHeader
+        icon={<Users className="h-5 w-5" />}
         title="Patient Management"
         description="Comprehensive patient registry with diagnosis history and doctor allocation."
+        badge={
+          data?.meta && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {data.meta.total} {data.meta.total === 1 ? "Patient" : "Patients"}
+            </span>
+          )
+        }
         action={headerAction}
       />
 
-      {/* Modern Integrated Search & Filter Toolbar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3 shadow-xs">
-        {/* Row 1: Dedicated Search Bar (Full Width) */}
-        <div className="w-full">
-          <SearchInput
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Search by patient name, condition, or phone..."
-            className="w-full"
-          />
+      {/* Directory Clinical KPI Metrics Strip */}
+      <DirectoryKpiStrip
+        metrics={[
+          {
+            icon: <Users className="h-5 w-5" />,
+            label: "Total Patients",
+            value: data?.meta?.total ?? 0,
+            subtext: "Admitted",
+            color: "primary",
+          },
+          {
+            icon: <HeartPulse className="h-5 w-5" />,
+            label: "Active Diagnoses",
+            value: filtersData?.conditions?.length ?? 0,
+            subtext: "Conditions",
+            color: "emerald",
+          },
+          {
+            icon: <Stethoscope className="h-5 w-5" />,
+            label: "Attending Doctors",
+            value: filtersData?.doctors?.length ?? 0,
+            subtext: "Specialists",
+            color: "indigo",
+          },
+          {
+            icon: <Activity className="h-5 w-5" />,
+            label: "Filter Status",
+            value: hasActiveFilters ? `${data?.patients?.length ?? 0} Found` : "All Records",
+            subtext: hasActiveFilters ? "Filtered" : "Live Roster",
+            color: hasActiveFilters ? "amber" : "violet",
+          },
+        ]}
+      />
+
+      {/* Smart Grouped Clinical Category Tabs */}
+      <SmartCategoryTabs
+        categories={[
+          { label: "All Diagnoses", value: "", icon: <Layers className="h-3.5 w-3.5" /> },
+          { label: "Hypertension", value: "Hypertension", icon: <HeartPulse className="h-3.5 w-3.5 text-rose-500" /> },
+          { label: "Diabetes Type 2", value: "Type 2 Diabetes", icon: <Activity className="h-3.5 w-3.5 text-amber-500" /> },
+          { label: "Asthma", value: "Asthma", icon: <Stethoscope className="h-3.5 w-3.5 text-sky-500" /> },
+          { label: "Migraine", value: "Migraine", icon: <ShieldCheck className="h-3.5 w-3.5 text-violet-500" /> },
+          { label: "Osteoarthritis", value: "Osteoarthritis", icon: <Building2 className="h-3.5 w-3.5 text-emerald-500" /> },
+        ]}
+        allConditions={filtersData?.conditions || []}
+        selectedCondition={condition}
+        onSelectCondition={handleConditionClick}
+      />
+
+      {/* Unified Command-Bar Filter Row (Single Sleek Bar) */}
+      <div className="rounded-2xl border border-border/80 bg-card p-2.5 shadow-xs">
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
+          {/* Search Bar */}
+          <div className="flex-1 min-w-[240px]">
+            <SearchInput
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Search by patient, phone, doctor..."
+              className="w-full max-w-none"
+            />
+          </div>
+
+          {/* Filter Dropdowns */}
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterSelect
+              icon={<Activity className="h-3.5 w-3.5" />}
+              value={condition}
+              onChange={(val) => {
+                setCondition(val);
+                setPage(1);
+                updateUrlParams({ condition: val, page: 1 });
+              }}
+              options={[
+                { label: "All Conditions", value: "" },
+                ...(filtersData?.conditions.map((c) => ({ label: c, value: c })) || []),
+              ]}
+              className="w-auto min-w-[135px]"
+            />
+
+            <FilterSelect
+              icon={<Stethoscope className="h-3.5 w-3.5" />}
+              value={doctor}
+              onChange={(val) => {
+                setDoctor(val);
+                setPage(1);
+                updateUrlParams({ doctor: val, page: 1 });
+              }}
+              options={[
+                { label: "All Doctors", value: "" },
+                ...(filtersData?.doctors.map((doc) => ({ label: doc.name, value: doc._id })) || []),
+              ]}
+              className="w-auto min-w-[130px]"
+            />
+
+            <FilterSelect
+              icon={<User className="h-3.5 w-3.5" />}
+              value={gender}
+              onChange={(val) => {
+                setGender(val);
+                setPage(1);
+                updateUrlParams({ gender: val, page: 1 });
+              }}
+              options={[
+                { label: "All Genders", value: "" },
+                { label: "Male", value: "Male" },
+                { label: "Female", value: "Female" },
+                { label: "Other", value: "Other" },
+              ]}
+              className="w-auto min-w-[110px]"
+            />
+
+            <FilterSelect
+              icon={<Calendar className="h-3.5 w-3.5" />}
+              value={datePreset}
+              onChange={handleDatePresetChange}
+              options={[
+                { label: "All Dates", value: "all" },
+                { label: "Registered Today", value: "today" },
+                { label: "Last 7 Days", value: "last7" },
+                { label: "Last 30 Days", value: "last30" },
+                { label: "This Month", value: "thisMonth" },
+                { label: "Custom Range...", value: "custom" },
+              ]}
+              className="w-auto min-w-[115px]"
+            />
+
+            <FilterSelect
+              icon={<ArrowUpDown className="h-3.5 w-3.5" />}
+              value={sort}
+              onChange={(val) => {
+                setSort(val);
+                setPage(1);
+                updateUrlParams({ sort: val, page: 1 });
+              }}
+              options={[
+                { label: "Newest First", value: "newest" },
+                { label: "Oldest First", value: "oldest" },
+                { label: "Name (A – Z)", value: "name_asc" },
+                { label: "Name (Z – A)", value: "name_desc" },
+                { label: "Age (Youngest)", value: "age_asc" },
+                { label: "Age (Oldest)", value: "age_desc" },
+              ]}
+              className="w-auto min-w-[120px]"
+            />
+
+            {/* Reset Filters button */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-9 px-2.5 rounded-xl text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                title="Reset all filters"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Reset</span>
+              </Button>
+            )}
+
+            {/* View Switcher: Table / Grid */}
+            <div className="flex items-center p-0.5 rounded-xl bg-muted/60 border border-border/50 ml-auto lg:ml-0">
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("table")}
+                className={cn(
+                  "p-1.5 rounded-lg text-xs transition-all cursor-pointer",
+                  viewMode === "table"
+                    ? "bg-card text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Table View"
+                aria-label="Table View"
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("grid")}
+                className={cn(
+                  "p-1.5 rounded-lg text-xs transition-all cursor-pointer",
+                  viewMode === "grid"
+                    ? "bg-card text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Card Grid View"
+                aria-label="Card Grid View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Row 2: Clean Filter Selectors (Responsive Grid: 2 cols on mobile, 3 on tablet, 5 on desktop) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 pt-2 border-t border-border/40">
-          {/* Condition Filter */}
-          <Select
-            value={condition}
-            onChange={(e) => {
-              const val = e.target.value;
-              setCondition(val);
-              setPage(1);
-              updateUrlParams({ condition: val, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="">All Conditions</option>
-            {filtersData?.conditions.map((cond) => (
-              <option key={cond} value={cond}>
-                {cond}
-              </option>
-            ))}
-          </Select>
-
-          {/* Doctor Filter */}
-          <Select
-            value={doctor}
-            onChange={(e) => {
-              const val = e.target.value;
-              setDoctor(val);
-              setPage(1);
-              updateUrlParams({ doctor: val, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="">All Doctors</option>
-            {filtersData?.doctors.map((doc) => (
-              <option key={doc._id} value={doc._id}>
-                {doc.name}
-              </option>
-            ))}
-          </Select>
-
-          {/* Gender Filter */}
-          <Select
-            value={gender}
-            onChange={(e) => {
-              const val = e.target.value;
-              setGender(val);
-              setPage(1);
-              updateUrlParams({ gender: val, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="">All Genders</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </Select>
-
-          {/* Date Preset */}
-          <Select
-            value={datePreset}
-            onChange={(e) => handleDatePresetChange(e.target.value)}
-            className="h-10 text-xs w-full"
-          >
-            <option value="all">All Dates</option>
-            <option value="today">Today</option>
-            <option value="last7">Last 7 Days</option>
-            <option value="last30">Last 30 Days</option>
-            <option value="thisMonth">This Month</option>
-            <option value="custom">Custom Range...</option>
-          </Select>
-
-          {/* Sort Order */}
-          <Select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              setPage(1);
-              updateUrlParams({ sort: e.target.value, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="name_asc">Name (A – Z)</option>
-            <option value="name_desc">Name (Z – A)</option>
-            <option value="age_asc">Age (Low – High)</option>
-            <option value="age_desc">Age (High – Low)</option>
-          </Select>
-        </div>
-
-        {/* Custom Date Range Selector (only revealed if 'custom' is selected) */}
+        {/* Custom Date Range Picker when selected */}
         {datePreset === "custom" && (
-          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 mt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
             <span className="font-semibold text-foreground flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-primary" />
               Custom Date Range:
@@ -393,15 +584,15 @@ export default function PatientsPage() {
           </div>
         )}
 
-        {/* Active Filter Chips with 1-Click Dismiss */}
+        {/* Active Filter Badges */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs">
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 mt-2.5 border-t border-border/50 text-xs">
             <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              Active:
+              Active Filters:
             </span>
 
             {search && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Keyword: &quot;{search}&quot;
                 <button
                   type="button"
@@ -415,15 +606,11 @@ export default function PatientsPage() {
             )}
 
             {condition && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Condition: {condition}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCondition("");
-                    setPage(1);
-                    updateUrlParams({ condition: undefined, page: 1 });
-                  }}
+                  onClick={() => handleConditionClick("")}
                   className="hover:text-destructive cursor-pointer ml-0.5"
                   title="Remove condition filter"
                 >
@@ -433,8 +620,8 @@ export default function PatientsPage() {
             )}
 
             {doctor && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
-                Doctor: {selectedDoctorObj?.name || "Assigned"}
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
+                Doctor: {selectedDoctorObj?.name || doctor}
                 <button
                   type="button"
                   onClick={() => {
@@ -451,7 +638,7 @@ export default function PatientsPage() {
             )}
 
             {gender && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Gender: {gender}
                 <button
                   type="button"
@@ -469,8 +656,8 @@ export default function PatientsPage() {
             )}
 
             {(startDate || endDate) && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40 px-2.5 py-1 text-xs font-medium">
-                Date: {datePreset !== "custom" ? datePreset : `${startDate || "Any"} – ${endDate || "Any"}`}
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
+                Date: {startDate || "start"} → {endDate || "today"}
                 <button
                   type="button"
                   onClick={() => handleDatePresetChange("all")}
@@ -483,14 +670,14 @@ export default function PatientsPage() {
             )}
 
             {sort !== "newest" && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Sort: {sort}
                 <button
                   type="button"
                   onClick={() => {
                     setSort("newest");
                     setPage(1);
-                    updateUrlParams({ sort: undefined, page: 1 });
+                    updateUrlParams({ sort: "newest", page: 1 });
                   }}
                   className="hover:text-destructive cursor-pointer ml-0.5"
                   title="Reset sort"
@@ -499,27 +686,32 @@ export default function PatientsPage() {
                 </button>
               </span>
             )}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetFilters}
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive gap-1 ml-auto"
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset All
-            </Button>
           </div>
         )}
       </div>
 
-      {/* Patient Table */}
-      <PatientTable
-        patients={data?.patients || []}
-        isLoading={isLoading}
-        onEdit={(pat) => setEditingPatient(pat)}
-        onDelete={handleDelete}
-      />
+      {/* Main Content: Table or Grid View */}
+      {viewMode === "table" ? (
+        <PatientTable
+          patients={data?.patients || []}
+          isLoading={isLoading}
+          onEdit={(patient) => setEditingPatient(patient)}
+          onDelete={handleDelete}
+          sort={sort}
+          onSortChange={(newSort) => {
+            setSort(newSort);
+            setPage(1);
+            updateUrlParams({ sort: newSort, page: 1 });
+          }}
+        />
+      ) : (
+        <PatientGrid
+          patients={data?.patients || []}
+          isLoading={isLoading}
+          onEdit={(patient) => setEditingPatient(patient)}
+          onDelete={handleDelete}
+        />
+      )}
 
       {/* Pagination */}
       {data?.meta && (
@@ -530,7 +722,7 @@ export default function PatientsPage() {
         />
       )}
 
-      {/* Create Patient Modal */}
+      {/* Modals */}
       <PatientFormModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -539,13 +731,12 @@ export default function PatientsPage() {
         isLoading={createPatientMutation.isPending}
       />
 
-      {/* Edit Patient Modal */}
       <PatientFormModal
         isOpen={!!editingPatient}
         onClose={() => setEditingPatient(null)}
         onSubmit={handleEditSubmit}
-        initialData={editingPatient}
         doctorsList={filtersData?.doctors || []}
+        initialData={editingPatient}
         isLoading={updatePatientMutation.isPending}
       />
     </div>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180" fill="none">
+  <defs>
+    <linearGradient id="apple-brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="50%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#3730A3" />
+    </linearGradient>
+  </defs>
+
+  <!-- iOS App Icon Squircle Base -->
+  <rect width="180" height="180" rx="40" fill="url(#apple-brand-grad)" />
+
+  <!-- Inner Soft Glow Ring -->
+  <rect x="10" y="10" width="160" height="160" rx="32" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="2" />
+
+  <!-- ECG Medical Pulse Waveform -->
+  <path
+    d="M 30 90 L 58 90 L 72 54 L 92 126 L 112 72 L 126 90 L 150 90"
+    stroke="#FFFFFF"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Status indicator dot -->
+  <circle cx="150" cy="90" r="7" fill="#38BDF8" />
+</svg>

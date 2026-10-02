@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   UserPlus,
@@ -77,6 +77,8 @@ export default function DoctorDetailPage() {
     setSelectedPatientForDelete(null);
   };
 
+  const router = useRouter();
+
   if (isDoctorLoading) {
     return (
       <div className="space-y-6">
@@ -94,7 +96,7 @@ export default function DoctorDetailPage() {
           title="Doctor not found"
           description="The requested practitioner does not exist or has been removed."
           actionLabel="Back to Doctors"
-          onAction={() => window.history.back()}
+          onAction={() => router.push("/doctors")}
         />
       </div>
     );
@@ -113,13 +115,13 @@ export default function DoctorDetailPage() {
         </Link>
 
         <Button
-          variant="gradient"
+          variant="default"
           size="sm"
-          className="rounded-xl h-9 font-semibold w-full sm:w-auto"
+          className="rounded-xl h-9 font-semibold text-xs gap-1.5 shadow-sm w-full sm:w-auto"
           onClick={() => setIsAddPatientModalOpen(true)}
         >
-          <UserPlus className="h-4 w-4 mr-1.5" />
-          Assign New Patient
+          <UserPlus className="h-4 w-4" />
+          <span>Assign Patient</span>
         </Button>
       </div>
 
@@ -196,7 +198,7 @@ export default function DoctorDetailPage() {
                             />
                           ) : (
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
-                              {patient.name.charAt(0)}
+                              {(patient.name || "P").charAt(0)}
                             </div>
                           )}
                           <div className="min-w-0">
@@ -263,7 +265,7 @@ export default function DoctorDetailPage() {
                         />
                       ) : (
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
-                          {patient.name.charAt(0)}
+                          {(patient.name || "P").charAt(0)}
                         </div>
                       )}
                       <div>

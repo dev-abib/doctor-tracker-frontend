@@ -2,14 +2,33 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Plus, RotateCcw, X, Calendar } from "lucide-react";
+import {
+  Plus,
+  RotateCcw,
+  X,
+  Calendar,
+  Download,
+  Stethoscope,
+  Users,
+  Building2,
+  Activity,
+  Award,
+  ArrowUpDown,
+  Layers,
+  LayoutGrid,
+  List,
+  HeartPulse,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SearchInput } from "@/components/shared/SearchInput";
+import { SmartCategoryTabs } from "@/components/shared/SmartCategoryTabs";
+import { DirectoryKpiStrip } from "@/components/shared/DirectoryKpiStrip";
 import { Pagination } from "@/components/shared/Pagination";
+import { FilterSelect } from "@/components/shared/FilterSelect";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { DoctorTable } from "@/features/doctors/components/DoctorTable";
+import { DoctorGrid } from "@/features/doctors/components/DoctorGrid";
 import { DoctorFormModal, DoctorFormData } from "@/features/doctors/components/DoctorFormModal";
 import {
   useDoctorsList,
@@ -19,6 +38,7 @@ import {
   useDeleteDoctor,
 } from "@/features/doctors/hooks/useDoctors";
 import { Doctor } from "@/types/api";
+import { cn } from "@/lib/utils";
 
 export default function DoctorsPage() {
   const router = useRouter();
@@ -36,7 +56,7 @@ export default function DoctorsPage() {
 
   // Query parameters state
   const [page, setPage] = useState(pageParam);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
   const [search, setSearch] = useState(searchParam);
   const [specialization, setSpecialization] = useState(specializationParam);
   const [hospital, setHospital] = useState(hospitalParam);
@@ -44,6 +64,21 @@ export default function DoctorsPage() {
   const [endDate, setEndDate] = useState(endDateParam);
   const [datePreset, setDatePreset] = useState("all");
   const [sort, setSort] = useState(sortParam);
+
+  // View mode: table or grid (persisted in localStorage)
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("doctor_tracker_doctors_view");
+    if (saved === "grid" || saved === "table") {
+      setViewMode(saved);
+    }
+  }, []);
+
+  const handleViewModeChange = (mode: "table" | "grid") => {
+    setViewMode(mode);
+    localStorage.setItem("doctor_tracker_doctors_view", mode);
+  };
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -65,7 +100,7 @@ export default function DoctorsPage() {
     [pathname, router, searchParams]
   );
 
-  // Sync state with URL params on navigation (e.g. browser back/forward)
+  // Sync state with URL params on navigation
   useEffect(() => {
     setPage(pageParam);
     setSearch(searchParam);
@@ -110,6 +145,13 @@ export default function DoctorsPage() {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     updateUrlParams({ page: newPage });
+  };
+
+  const handleSpecialtyClick = (spec: string) => {
+    const newVal = specialization === spec ? "" : spec;
+    setSpecialization(newVal);
+    setPage(1);
+    updateUrlParams({ specialization: newVal || undefined, page: 1 });
   };
 
   const handleDatePresetChange = (preset: string) => {
@@ -167,14 +209,28 @@ export default function DoctorsPage() {
   };
 
   const handleCreateSubmit = async (formData: DoctorFormData) => {
-    await createDoctorMutation.mutateAsync(formData);
+    await createDoctorMutation.mutateAsync({
+      name: formData.name,
+      specialization: formData.specialization,
+      hospital: formData.hospital,
+      phone: formData.phone,
+      email: formData.email,
+      image: formData.image || undefined,
+    });
   };
 
   const handleEditSubmit = async (formData: DoctorFormData) => {
     if (!editingDoctor) return;
     await updateDoctorMutation.mutateAsync({
       id: editingDoctor._id,
-      data: formData,
+      data: {
+        name: formData.name,
+        specialization: formData.specialization,
+        hospital: formData.hospital,
+        phone: formData.phone,
+        email: formData.email,
+        image: formData.image || undefined,
+      },
     });
     setEditingDoctor(null);
   };
@@ -183,121 +239,265 @@ export default function DoctorsPage() {
     await deleteDoctorMutation.mutateAsync(id);
   };
 
-  const hasActiveFilters = !!(
-    search ||
-    specialization ||
-    hospital ||
-    startDate ||
-    endDate ||
-    sort !== "newest"
-  );
+  const handleExportCsv = () => {
+    const list = data?.doctors || [];
+    if (list.length === 0) return;
+
+    const escapeCsv = (val: any) => `"${String(val ?? "").replace(/"/g, '""')}"`;
+    const headers = ["ID", "Name", "Specialization", "Hospital", "Phone", "Email", "Patients Count", "Joined Date"];
+    const rows = list.map((d) => [
+      escapeCsv(d._id),
+      escapeCsv(d.name),
+      escapeCsv(d.specialization),
+      escapeCsv(d.hospital),
+      escapeCsv(d.phone),
+      escapeCsv(d.email),
+      d.patientCount ?? 0,
+      escapeCsv(new Date(d.createdAt).toLocaleDateString()),
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `doctors_export_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const activeFiltersCount = [
+    Boolean(search),
+    Boolean(specialization),
+    Boolean(hospital),
+    Boolean(startDate || endDate),
+    sort !== "newest",
+  ].filter(Boolean).length;
+
+  const hasActiveFilters = activeFiltersCount > 0;
 
   const headerAction = (
-    <Button
-      variant="gradient"
-      size="sm"
-      className="rounded-xl h-9 font-semibold"
-      onClick={() => setIsCreateModalOpen(true)}
-    >
-      <Plus className="h-4 w-4 mr-1.5" />
-      Add New Doctor
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        className="rounded-xl h-9 font-semibold text-xs gap-1.5"
+        onClick={handleExportCsv}
+        disabled={isLoading || (data?.doctors || []).length === 0}
+        title="Export filtered doctors list to CSV"
+      >
+        <Download className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="hidden sm:inline">Export CSV</span>
+      </Button>
+      <Button
+        variant="default"
+        size="sm"
+        className="rounded-xl h-9 font-semibold text-xs gap-1.5 shadow-xs shadow-primary/20"
+        onClick={() => setIsCreateModalOpen(true)}
+      >
+        <Plus className="h-4 w-4" />
+        <span>Add Doctor</span>
+      </Button>
+    </div>
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       <PageHeader
+        icon={<Stethoscope className="h-5 w-5" />}
         title="Doctor Directory"
         description="Search, manage and monitor medical practitioners and their clinical assignments."
+        badge={
+          data?.meta && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              {data.meta.total} {data.meta.total === 1 ? "Doctor" : "Doctors"}
+            </span>
+          )
+        }
         action={headerAction}
       />
 
-      {/* Modern Integrated Search & Filter Toolbar */}
-      <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 space-y-3 shadow-xs">
-        {/* Row 1: Dedicated Search Bar (Full Width) */}
-        <div className="w-full">
-          <SearchInput
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Search by doctor name, email, hospital, or specialty..."
-            className="w-full"
-          />
+      {/* Directory Clinical KPI Metrics Strip */}
+      <DirectoryKpiStrip
+        metrics={[
+          {
+            icon: <Stethoscope className="h-5 w-5" />,
+            label: "Total Doctors",
+            value: data?.meta?.total ?? 0,
+            subtext: "Licensed",
+            color: "primary",
+          },
+          {
+            icon: <Award className="h-5 w-5" />,
+            label: "Specialties",
+            value: filtersData?.specializations?.length ?? 0,
+            subtext: "Fields",
+            color: "indigo",
+          },
+          {
+            icon: <Building2 className="h-5 w-5" />,
+            label: "Hospitals",
+            value: filtersData?.hospitals?.length ?? 0,
+            subtext: "Affiliated",
+            color: "emerald",
+          },
+          {
+            icon: <Activity className="h-5 w-5" />,
+            label: "Filter Status",
+            value: hasActiveFilters ? `${data?.doctors?.length ?? 0} Found` : "All Doctors",
+            subtext: hasActiveFilters ? "Filtered" : "Live Roster",
+            color: hasActiveFilters ? "amber" : "violet",
+          },
+        ]}
+      />
+
+      {/* Smart Grouped Specialty Category Tabs */}
+      <SmartCategoryTabs
+        categories={[
+          { label: "All Specialties", value: "", icon: <Layers className="h-3.5 w-3.5" /> },
+          { label: "Cardiology", value: "Cardiology", icon: <HeartPulse className="h-3.5 w-3.5 text-rose-500" /> },
+          { label: "Neurology", value: "Neurology", icon: <Activity className="h-3.5 w-3.5 text-indigo-500" /> },
+          { label: "Pediatrics", value: "Pediatrics", icon: <Users className="h-3.5 w-3.5 text-emerald-500" /> },
+          { label: "Orthopedics", value: "Orthopedics", icon: <Award className="h-3.5 w-3.5 text-amber-500" /> },
+          { label: "Dermatology", value: "Dermatology", icon: <Building2 className="h-3.5 w-3.5 text-sky-500" /> },
+        ]}
+        allConditions={filtersData?.specializations || []}
+        selectedCondition={specialization}
+        onSelectCondition={handleSpecialtyClick}
+      />
+
+      {/* Unified Command-Bar Filter Row (Single Sleek Bar) */}
+      <div className="rounded-2xl border border-border/80 bg-card p-2.5 shadow-xs">
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
+          {/* Search Bar */}
+          <div className="flex-1 min-w-[240px]">
+            <SearchInput
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Search by doctor, email, hospital..."
+              className="w-full max-w-none"
+            />
+          </div>
+
+          {/* Filter Dropdowns */}
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterSelect
+              icon={<Stethoscope className="h-3.5 w-3.5" />}
+              value={specialization}
+              onChange={(val) => {
+                setSpecialization(val);
+                setPage(1);
+                updateUrlParams({ specialization: val, page: 1 });
+              }}
+              options={[
+                { label: "All Specialties", value: "" },
+                ...(filtersData?.specializations.map((spec) => ({ label: spec, value: spec })) || []),
+              ]}
+              className="w-auto min-w-[135px]"
+            />
+
+            <FilterSelect
+              icon={<Building2 className="h-3.5 w-3.5" />}
+              value={hospital}
+              onChange={(val) => {
+                setHospital(val);
+                setPage(1);
+                updateUrlParams({ hospital: val, page: 1 });
+              }}
+              options={[
+                { label: "All Hospitals", value: "" },
+                ...(filtersData?.hospitals.map((hosp) => ({ label: hosp, value: hosp })) || []),
+              ]}
+              className="w-auto min-w-[130px]"
+            />
+
+            <FilterSelect
+              icon={<Calendar className="h-3.5 w-3.5" />}
+              value={datePreset}
+              onChange={handleDatePresetChange}
+              options={[
+                { label: "All Dates", value: "all" },
+                { label: "Joined Today", value: "today" },
+                { label: "Last 7 Days", value: "last7" },
+                { label: "Last 30 Days", value: "last30" },
+                { label: "This Month", value: "thisMonth" },
+                { label: "Custom Range...", value: "custom" },
+              ]}
+              className="w-auto min-w-[115px]"
+            />
+
+            <FilterSelect
+              icon={<ArrowUpDown className="h-3.5 w-3.5" />}
+              value={sort}
+              onChange={(val) => {
+                setSort(val);
+                setPage(1);
+                updateUrlParams({ sort: val, page: 1 });
+              }}
+              options={[
+                { label: "Newest First", value: "newest" },
+                { label: "Oldest First", value: "oldest" },
+                { label: "Name (A – Z)", value: "name_asc" },
+                { label: "Name (Z – A)", value: "name_desc" },
+              ]}
+              className="w-auto min-w-[120px]"
+            />
+
+            {/* Reset Filters button */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-9 px-2.5 rounded-xl text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                title="Reset all filters"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Reset</span>
+              </Button>
+            )}
+
+            {/* View Switcher: Table / Grid */}
+            <div className="flex items-center p-0.5 rounded-xl bg-muted/60 border border-border/50 ml-auto lg:ml-0">
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("table")}
+                className={cn(
+                  "p-1.5 rounded-lg text-xs transition-all cursor-pointer",
+                  viewMode === "table"
+                    ? "bg-card text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Table View"
+                aria-label="Table View"
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("grid")}
+                className={cn(
+                  "p-1.5 rounded-lg text-xs transition-all cursor-pointer",
+                  viewMode === "grid"
+                    ? "bg-card text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Card Grid View"
+                aria-label="Card Grid View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Row 2: Clean Filter Selectors (Responsive Grid: 2 cols on mobile, 4 cols on desktop) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-border/40">
-          {/* Specialization Filter */}
-          <Select
-            value={specialization}
-            onChange={(e) => {
-              const val = e.target.value;
-              setSpecialization(val);
-              setPage(1);
-              updateUrlParams({ specialization: val, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="">All Specialties</option>
-            {filtersData?.specializations.map((spec) => (
-              <option key={spec} value={spec}>
-                {spec}
-              </option>
-            ))}
-          </Select>
-
-          {/* Hospital Filter */}
-          <Select
-            value={hospital}
-            onChange={(e) => {
-              const val = e.target.value;
-              setHospital(val);
-              setPage(1);
-              updateUrlParams({ hospital: val, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="">All Hospitals</option>
-            {filtersData?.hospitals.map((hosp) => (
-              <option key={hosp} value={hosp}>
-                {hosp}
-              </option>
-            ))}
-          </Select>
-
-          {/* Date Preset */}
-          <Select
-            value={datePreset}
-            onChange={(e) => handleDatePresetChange(e.target.value)}
-            className="h-10 text-xs w-full"
-          >
-            <option value="all">All Dates</option>
-            <option value="today">Joined Today</option>
-            <option value="last7">Last 7 Days</option>
-            <option value="last30">Last 30 Days</option>
-            <option value="thisMonth">This Month</option>
-            <option value="custom">Custom Range...</option>
-          </Select>
-
-          {/* Sort Order */}
-          <Select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              setPage(1);
-              updateUrlParams({ sort: e.target.value, page: 1 });
-            }}
-            className="h-10 text-xs w-full"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="name_asc">Name (A – Z)</option>
-            <option value="name_desc">Name (Z – A)</option>
-          </Select>
-        </div>
-
-        {/* Custom Date Range Selector (only revealed if 'custom' is selected) */}
+        {/* Custom Date Range Picker when selected */}
         {datePreset === "custom" && (
-          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 mt-2.5 border-t border-border/50 text-xs text-muted-foreground animate-in fade-in duration-150">
             <span className="font-semibold text-foreground flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-primary" />
               Custom Date Range:
@@ -328,15 +528,15 @@ export default function DoctorsPage() {
           </div>
         )}
 
-        {/* Row 3: Active Filter Pills / Reset */}
+        {/* Active Filter Badges */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-border/50 text-xs">
+          <div className="flex flex-wrap items-center gap-2 pt-2.5 mt-2.5 border-t border-border/50 text-xs">
             <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              Active:
+              Active Filters:
             </span>
 
             {search && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Keyword: &quot;{search}&quot;
                 <button
                   type="button"
@@ -350,17 +550,13 @@ export default function DoctorsPage() {
             )}
 
             {specialization && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Specialty: {specialization}
                 <button
                   type="button"
-                  onClick={() => {
-                    setSpecialization("");
-                    setPage(1);
-                    updateUrlParams({ specialization: undefined, page: 1 });
-                  }}
+                  onClick={() => handleSpecialtyClick("")}
                   className="hover:text-destructive cursor-pointer ml-0.5"
-                  title="Remove specialization filter"
+                  title="Remove specialty filter"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -368,7 +564,7 @@ export default function DoctorsPage() {
             )}
 
             {hospital && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 px-2.5 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
                 Hospital: {hospital}
                 <button
                   type="button"
@@ -386,8 +582,8 @@ export default function DoctorsPage() {
             )}
 
             {(startDate || endDate) && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40 px-2.5 py-1 text-xs font-medium">
-                Date: {datePreset !== "custom" ? datePreset : `${startDate || "Any"} – ${endDate || "Any"}`}
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
+                Date: {startDate || "start"} → {endDate || "today"}
                 <button
                   type="button"
                   onClick={() => handleDatePresetChange("all")}
@@ -400,14 +596,14 @@ export default function DoctorsPage() {
             )}
 
             {sort !== "newest" && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-2.5 py-1 text-xs font-medium">
-                Sort: {sort === "oldest" ? "Oldest" : sort === "name_asc" ? "Name (A–Z)" : "Name (Z–A)"}
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-xs font-medium">
+                Sort: {sort === "oldest" ? "Oldest" : sort === "name_asc" ? "Name (A-Z)" : "Name (Z-A)"}
                 <button
                   type="button"
                   onClick={() => {
                     setSort("newest");
                     setPage(1);
-                    updateUrlParams({ sort: undefined, page: 1 });
+                    updateUrlParams({ sort: "newest", page: 1 });
                   }}
                   className="hover:text-destructive cursor-pointer ml-0.5"
                   title="Reset sort"
@@ -416,29 +612,34 @@ export default function DoctorsPage() {
                 </button>
               </span>
             )}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetFilters}
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive gap-1 ml-auto cursor-pointer"
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset All
-            </Button>
           </div>
         )}
       </div>
 
-      {/* Doctors Table */}
-      <DoctorTable
-        doctors={data?.doctors || []}
-        isLoading={isLoading}
-        onEdit={(doc) => setEditingDoctor(doc)}
-        onDelete={handleDelete}
-      />
+      {/* Main Content: Table or Grid View */}
+      {viewMode === "table" ? (
+        <DoctorTable
+          doctors={data?.doctors || []}
+          isLoading={isLoading}
+          onEdit={(doc) => setEditingDoctor(doc)}
+          onDelete={handleDelete}
+          sort={sort}
+          onSortChange={(newSort) => {
+            setSort(newSort);
+            setPage(1);
+            updateUrlParams({ sort: newSort, page: 1 });
+          }}
+        />
+      ) : (
+        <DoctorGrid
+          doctors={data?.doctors || []}
+          isLoading={isLoading}
+          onEdit={(doc) => setEditingDoctor(doc)}
+          onDelete={handleDelete}
+        />
+      )}
 
-      {/* Pagination */}
+      {/* Pagination Controls */}
       {data?.meta && (
         <Pagination
           meta={data.meta}
@@ -447,7 +648,7 @@ export default function DoctorsPage() {
         />
       )}
 
-      {/* Create Doctor Modal */}
+      {/* Doctor Modals */}
       <DoctorFormModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -455,7 +656,6 @@ export default function DoctorsPage() {
         isLoading={createDoctorMutation.isPending}
       />
 
-      {/* Edit Doctor Modal */}
       <DoctorFormModal
         isOpen={!!editingDoctor}
         onClose={() => setEditingDoctor(null)}

@@ -19,6 +19,7 @@ export interface PatientPayload {
   gender: "Male" | "Female" | "Other";
   phone: string;
   email?: string;
+  image?: string;
   condition: string;
   doctor: string;
   visitDate?: string;

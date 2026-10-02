@@ -23,7 +23,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-[#e8eef6] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
+      <div className="rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs">
         <div className="flex items-center justify-between">
           <Skeleton className="h-3.5 w-24" />
           <Skeleton className="h-8 w-8 rounded-xl" />
@@ -37,36 +37,41 @@ export const StatCard: React.FC<StatCardProps> = ({
   }
 
   return (
-    <div className="rounded-2xl border border-[#e8eef6] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between">
+    <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-primary/30 transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+      {/* Subtle top gradient accent on hover */}
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate pr-2">
+        <p className="text-xs font-semibold text-muted-foreground truncate pr-2">
           {title}
         </p>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105 transition-all duration-200 shadow-2xs">
           {icon}
         </div>
       </div>
 
       <div className="mt-3">
-        <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <div className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
           {typeof value === "number" ? formatNumber(value) : value}
         </div>
 
         {trendText && (
-          <p
-            className={cn(
-              "mt-1 text-xs font-semibold leading-tight",
-              trendType === "positive" && "text-emerald-600 dark:text-emerald-400",
-              trendType === "highlight" && "text-[#5046e5] dark:text-indigo-400",
-              trendType === "neutral" && "text-slate-500 dark:text-slate-400"
-            )}
-          >
-            {trendText}
-          </p>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span
+              className={cn(
+                "inline-flex items-center text-[11px] font-bold",
+                trendType === "positive" && "text-emerald-600 dark:text-emerald-400",
+                trendType === "highlight" && "text-primary",
+                trendType === "neutral" && "text-muted-foreground"
+              )}
+            >
+              {trendText}
+            </span>
+          </div>
         )}
 
         {subtext && !trendText && (
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-normal">
+          <p className="mt-1 text-[11px] text-muted-foreground font-normal">
             {subtext}
           </p>
         )}

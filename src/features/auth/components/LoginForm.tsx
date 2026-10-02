@@ -52,21 +52,21 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[36px] bg-white dark:bg-slate-900 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.08)] border border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2">
+    <div className="w-full max-w-4xl overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[36px] bg-card shadow-[0_20px_70px_-15px_rgba(0,0,0,0.08)] border border-border/80 grid grid-cols-1 md:grid-cols-2">
       {/* Left Form Section */}
       <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14">
         <div>
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#5046e5] text-white shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
                 <Activity className="h-5 w-5" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                 Doctor Tracker
               </h1>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Sign in to access your clinical dashboard
             </p>
           </div>
@@ -78,15 +78,15 @@ export const LoginForm: React.FC = () => {
                 <input
                   type="email"
                   placeholder="admin@doctortracker.com"
-                  className="w-full h-[52px] rounded-2xl bg-[#eff2fc] dark:bg-slate-800/90 px-4 pr-12 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none border border-transparent focus:border-indigo-400 focus:bg-white dark:focus:bg-slate-800 transition-all"
+                  className="w-full h-[52px] rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
                   {...register("email")}
                 />
-                <div className="absolute right-3.5 flex h-7 w-7 items-center justify-center rounded-lg bg-[#5046e5] text-white text-xs font-bold shadow-sm">
+                <div className="absolute right-3.5 flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-xs">
                   DT
                 </div>
               </div>
               {errors.email && (
-                <p className="mt-1 text-xs text-rose-500 font-medium">
+                <p className="mt-1 text-xs text-destructive font-medium">
                   {errors.email.message}
                 </p>
               )}
@@ -98,13 +98,13 @@ export const LoginForm: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••••"
-                  className="w-full h-[52px] rounded-2xl bg-[#eff2fc] dark:bg-slate-800/90 px-4 pr-12 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 tracking-wider outline-none border border-transparent focus:border-indigo-400 focus:bg-white dark:focus:bg-slate-800 transition-all"
+                  className="w-full h-[52px] rounded-2xl bg-muted/50 px-4 pr-12 text-sm font-medium text-foreground placeholder:text-muted-foreground tracking-wider outline-none border border-border/60 focus:border-primary focus:bg-background transition-all"
                   {...register("password")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="absolute right-3.5 p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -115,7 +115,7 @@ export const LoginForm: React.FC = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-xs text-rose-500 font-medium">
+                <p className="mt-1 text-xs text-destructive font-medium">
                   {errors.password.message}
                 </p>
               )}
@@ -125,7 +125,7 @@ export const LoginForm: React.FC = () => {
             <div className="flex justify-end pt-1">
               <button
                 type="button"
-                className="text-xs font-medium text-[#5046e5] hover:text-[#4338ca] dark:text-indigo-400 transition-colors"
+                className="text-xs font-semibold text-primary hover:underline transition-all cursor-pointer"
               >
                 Forgot password?
               </button>
@@ -135,11 +135,11 @@ export const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[52px] rounded-2xl bg-[#5046e5] hover:bg-[#4338ca] text-white font-medium text-sm transition-all duration-200 shadow-sm active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full h-[52px] rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition-all duration-200 shadow-md shadow-primary/25 active:scale-[0.99] disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               {isSubmitting ? (
                 <>
-                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                   <span>Signing In...</span>
                 </>
               ) : (
@@ -153,7 +153,7 @@ export const LoginForm: React.FC = () => {
             <button
               type="button"
               onClick={fillDemoAdmin}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5046e5] hover:text-[#4338ca] dark:text-indigo-400 transition-colors cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline transition-all cursor-pointer group"
             >
               <KeyRound className="h-3.5 w-3.5 group-hover:rotate-12 transition-transform" />
               <span>Quick Dev Credentials</span>
@@ -163,14 +163,14 @@ export const LoginForm: React.FC = () => {
 
         {/* Footer info */}
         <div className="mt-8 text-center">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500">
+          <p className="text-[11px] text-muted-foreground">
             Protected clinical admin area • Unauthorized access is monitored
           </p>
         </div>
       </div>
 
       {/* Right Studio Visual Section */}
-      <div className="hidden md:block relative w-full h-full min-h-[480px] bg-slate-100 dark:bg-slate-800">
+      <div className="hidden md:block relative w-full h-full min-h-[480px] bg-muted">
         <img
           src="/images/studio_desk.jpg"
           alt="Studio Workspace"

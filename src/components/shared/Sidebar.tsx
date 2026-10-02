@@ -17,14 +17,18 @@ import {
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
-import { ThemeToggle } from "./ThemeToggle";
-
 interface SidebarProps {
-  isOpen: boolean;
+  isOpen: boolean; // Mobile drawer state
   onClose: () => void;
+  isCollapsed: boolean; // Desktop collapse state
+  onToggleCollapse: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  isOpen,
+  onClose,
+  isCollapsed,
+}) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -33,159 +37,192 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const navItems = [
+    {
+      label: "Dashboard",
+      href: "/",
+      icon: LayoutDashboard,
+      badge: null,
+    },
+    {
+      label: "Doctors",
+      href: "/doctors",
+      icon: Stethoscope,
+      badge: "Staff",
+      badgeColor: "bg-indigo-50 dark:bg-indigo-950/80 text-primary dark:text-indigo-300",
+    },
+    {
+      label: "Patients",
+      href: "/patients",
+      icon: Users,
+      badge: "Active",
+      badgeColor: "bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+      icon: Settings,
+      badge: "Admin",
+      badgeColor: "bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400",
+    },
+  ];
+
   return (
     <>
-      {/* Mobile backdrop */}
+      {/* Mobile Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden animate-in fade-in duration-200"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Fixed Sidebar container */}
+      {/* Synchronized Left Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-50 flex w-64 flex-col justify-between bg-white dark:bg-slate-900 border-r border-[#e8eef6] dark:border-slate-800 p-4 transition-transform duration-300 ease-in-out lg:top-4 lg:bottom-4 lg:left-4 lg:h-[calc(100vh-2rem)] lg:translate-x-0 lg:rounded-3xl lg:border lg:border-[#e8eef6] lg:dark:border-slate-800 lg:shadow-[0_4px_25px_-4px_rgba(0,0,0,0.03)]",
-          isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"
+          "fixed top-0 bottom-0 left-0 z-50 flex flex-col justify-between bg-card border-r border-border/70 transition-all duration-300 ease-in-out h-screen select-none",
+          // Mobile responsive drawer
+          isOpen ? "translate-x-0 w-72 shadow-2xl" : "-translate-x-full lg:translate-x-0",
+          // Desktop collapsed vs expanded width
+          isCollapsed ? "lg:w-20" : "lg:w-64"
         )}
       >
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Brand Header */}
-          <div className="flex items-center justify-between px-1.5 pt-1 pb-5 shrink-0 border-b border-[#f1f5f9] dark:border-slate-800/80">
+          {/* Header Brand (Synchronized h-16 with Topbar) */}
+          <div
+            className={cn(
+              "flex items-center h-16 border-b border-border/70 px-4 shrink-0 transition-all",
+              isCollapsed ? "justify-center" : "justify-between"
+            )}
+          >
             <Link
               href="/"
-              className="flex items-center gap-2.5 group min-w-0"
+              className={cn(
+                "flex items-center gap-2.5 group min-w-0 transition-all",
+                isCollapsed && "justify-center"
+              )}
               onClick={onClose}
+              title="Doctor Tracker"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#5046e5] text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-sm shadow-indigo-500/25 group-hover:scale-105 transition-transform">
                 <Activity className="h-5 w-5" />
               </div>
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-slate-900 dark:text-white text-base leading-none whitespace-nowrap">
-                    Doctor Tracker
-                  </span>
-                  <span className="rounded bg-[#eff2fc] dark:bg-indigo-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#5046e5] dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800 shrink-0">
-                    PRO
+
+              {!isCollapsed && (
+                <div className="flex flex-col min-w-0 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-foreground text-sm leading-none whitespace-nowrap tracking-tight">
+                      Doctor Tracker
+                    </span>
+                    <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary border border-primary/20 shrink-0">
+                      PRO
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-medium text-muted-foreground leading-tight mt-0.5 whitespace-nowrap">
+                    Clinical Portal
                   </span>
                 </div>
-                <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-1 whitespace-nowrap">
-                  Clinical Control Center
-                </span>
-              </div>
+              )}
             </Link>
 
+            {/* Mobile Drawer Close Button */}
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
-              aria-label="Close menu"
+              className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted lg:hidden cursor-pointer shrink-0"
+              aria-label="Close navigation"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Connected Application Routes Only */}
-          <div className="flex-1 overflow-y-auto pr-1 space-y-5 pt-4">
-            {/* Section 1: CLINICAL MODULES */}
+          {/* Navigation Items */}
+          <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+            {/* Clinical Portal Group */}
             <div>
-              <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-                CLINICAL PORTAL
-              </p>
+              {!isCollapsed ? (
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-2">
+                  Clinical Portal
+                </p>
+              ) : (
+                <div className="h-1" />
+              )}
+
               <nav className="space-y-1">
-                <Link
-                  href="/"
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-colors",
-                    isNavActive("/")
-                      ? "bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 shadow-2xs"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </div>
-                </Link>
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = isNavActive(item.href);
 
-                <Link
-                  href="/doctors"
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium transition-colors",
-                    isNavActive("/doctors")
-                      ? "bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 font-semibold shadow-2xs"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Stethoscope className="h-4 w-4" />
-                    <span>Doctors</span>
-                  </div>
-                  <span className="rounded bg-indigo-50 dark:bg-indigo-950/80 px-1.5 py-0.5 text-[9px] font-bold text-[#5046e5] dark:text-indigo-300">
-                    Staff
-                  </span>
-                </Link>
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      title={isCollapsed ? item.label : undefined}
+                      className={cn(
+                        "flex items-center rounded-xl text-xs transition-all group relative",
+                        isCollapsed
+                          ? "justify-center h-10 w-full"
+                          : "justify-between px-3 py-2.5 font-medium",
+                        active
+                          ? "bg-primary/10 text-primary font-semibold shadow-2xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                      )}
+                    >
+                      <div className={cn("flex items-center gap-3 min-w-0", isCollapsed && "justify-center")}>
+                        <Icon
+                          className={cn(
+                            "h-4 w-4 shrink-0 transition-transform group-hover:scale-110",
+                            active ? "text-primary font-bold" : "text-muted-foreground group-hover:text-foreground"
+                          )}
+                        />
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                      </div>
 
-                <Link
-                  href="/patients"
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium transition-colors",
-                    isNavActive("/patients")
-                      ? "bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 font-semibold shadow-2xs"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Users className="h-4 w-4" />
-                    <span>Patients</span>
-                  </div>
-                  <span className="rounded bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                    Active
-                  </span>
-                </Link>
+                      {!isCollapsed && item.badge && (
+                        <span className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold shrink-0", item.badgeColor)}>
+                          {item.badge}
+                        </span>
+                      )}
 
-                <Link
-                  href="/settings"
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium transition-colors",
-                    isNavActive("/settings")
-                      ? "bg-[#eff2fc] dark:bg-indigo-950/60 text-[#5046e5] dark:text-indigo-400 font-semibold shadow-2xs"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </div>
-                  <span className="rounded bg-violet-50 dark:bg-violet-950/80 px-1.5 py-0.5 text-[9px] font-bold text-violet-600 dark:text-violet-400">
-                    Admin
-                  </span>
-                </Link>
+                      {/* Collapsed Active State Indicator */}
+                      {isCollapsed && active && (
+                        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary" />
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 
-            {/* Section 2: DEVELOPER & API */}
+            {/* Developer Section */}
             <div>
-              <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-                DEVELOPER TOOLS
-              </p>
+              {!isCollapsed ? (
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-2">
+                  Developer Tools
+                </p>
+              ) : (
+                <div className="h-px bg-border/40 my-2 mx-1" />
+              )}
+
               <nav className="space-y-1">
                 <a
                   href="http://localhost:5000/api/docs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 transition-colors"
+                  title={isCollapsed ? "Swagger API Docs" : undefined}
+                  className={cn(
+                    "flex items-center rounded-xl text-xs transition-all text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                    isCollapsed
+                      ? "justify-center h-10 w-full"
+                      : "justify-between px-3 py-2.5 font-medium"
+                  )}
                 >
-                  <div className="flex items-center gap-3">
-                    <Code2 className="h-4 w-4" />
-                    <span>Swagger API Docs</span>
+                  <div className={cn("flex items-center gap-3 min-w-0", isCollapsed && "justify-center")}>
+                    <Code2 className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-foreground" />
+                    {!isCollapsed && <span className="truncate">Swagger API Docs</span>}
                   </div>
-                  <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                  {!isCollapsed && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />}
                 </a>
               </nav>
             </div>
@@ -193,14 +230,53 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Bottom Profile & Utilities */}
-        <div className="border-t border-[#e8eef6] dark:border-slate-800 pt-3 shrink-0 space-y-2">
-          <div className="flex items-center justify-between p-2 rounded-2xl bg-[#f8fafc] dark:bg-slate-800/60 border border-[#e8eef6] dark:border-slate-700/60">
-            <Link
-              href="/settings"
-              onClick={onClose}
-              className="flex items-center gap-2.5 overflow-hidden min-w-0 hover:opacity-85 transition-opacity"
-            >
-              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#5046e5] text-white font-bold text-xs shadow-xs overflow-hidden">
+        <div className="border-t border-border/70 p-3 shrink-0 bg-card/60">
+          {!isCollapsed ? (
+            <div className="flex items-center justify-between p-2 rounded-xl bg-muted/40 border border-border/60">
+              <Link
+                href="/settings"
+                onClick={onClose}
+                className="flex items-center gap-2.5 overflow-hidden min-w-0 hover:opacity-85 transition-opacity"
+              >
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs overflow-hidden">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>{user?.name ? user.name.charAt(0) : "A"}</span>
+                  )}
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-card" />
+                </div>
+                <div className="flex flex-col overflow-hidden text-left min-w-0">
+                  <span className="truncate text-xs font-bold text-foreground leading-tight">
+                    {user?.name || "Dr. Administrator"}
+                  </span>
+                  <span className="text-[9px] font-bold uppercase text-primary leading-tight mt-0.5">
+                    SUPER ADMIN
+                  </span>
+                </div>
+              </Link>
+
+              <button
+                onClick={logout}
+                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer shrink-0 ml-1"
+                title="Sign Out"
+                aria-label="Sign Out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 py-1">
+              <Link
+                href="/settings"
+                onClick={onClose}
+                title={user?.name || "Dr. Administrator"}
+                className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs overflow-hidden hover:scale-105 transition-transform"
+              >
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
@@ -210,30 +286,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 ) : (
                   <span>{user?.name ? user.name.charAt(0) : "A"}</span>
                 )}
-                <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
-              </div>
-              <div className="flex flex-col overflow-hidden text-left min-w-0">
-                <span className="truncate text-xs font-bold text-slate-900 dark:text-white leading-tight">
-                  {user?.name || "Dr. Administrator"}
-                </span>
-                <span className="text-[9px] font-bold uppercase text-[#5046e5] dark:text-indigo-400 leading-tight mt-0.5">
-                  SUPER ADMIN
-                </span>
-              </div>
-            </Link>
+                <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-card" />
+              </Link>
 
-            <div className="flex items-center gap-1 shrink-0">
-              <ThemeToggle />
               <button
                 onClick={logout}
-                className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer"
+                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
                 title="Sign Out"
                 aria-label="Sign Out"
               >
                 <LogOut className="h-4 w-4" />
               </button>
             </div>
-          </div>
+          )}
         </div>
       </aside>
     </>

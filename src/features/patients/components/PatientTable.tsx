@@ -10,7 +10,13 @@ import {
   Pencil,
   Trash2,
   Calendar,
+  Copy,
+  Check,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -24,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { formatDate, getConditionBadgeVariant } from "@/lib/utils";
+import { formatDate, getConditionBadgeVariant, cn } from "@/lib/utils";
 import { Patient } from "@/types/api";
 
 interface Props {
@@ -32,6 +38,8 @@ interface Props {
   isLoading: boolean;
   onEdit: (patient: Patient) => void;
   onDelete: (id: string) => Promise<any>;
+  sort?: string;
+  onSortChange?: (newSort: string) => void;
 }
 
 export const PatientTable: React.FC<Props> = ({
@@ -39,9 +47,12 @@ export const PatientTable: React.FC<Props> = ({
   isLoading,
   onEdit,
   onDelete,
+  sort,
+  onSortChange,
 }) => {
   const [selectedPatientForDelete, setSelectedPatientForDelete] = useState<Patient | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleDeleteConfirm = async () => {
     if (!selectedPatientForDelete) return;
@@ -52,6 +63,31 @@ export const PatientTable: React.FC<Props> = ({
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const copyToClipboard = (text: string, label: string, uniqueKey: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(uniqueKey);
+    toast.success(`${label} copied to clipboard`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleToggleNameSort = () => {
+    if (!onSortChange) return;
+    if (sort === "name_asc") onSortChange("name_desc");
+    else onSortChange("name_asc");
+  };
+
+  const handleToggleAgeSort = () => {
+    if (!onSortChange) return;
+    if (sort === "age_asc") onSortChange("age_desc");
+    else onSortChange("age_asc");
+  };
+
+  const handleToggleDateSort = () => {
+    if (!onSortChange) return;
+    if (sort === "newest") onSortChange("oldest");
+    else onSortChange("newest");
   };
 
   if (isLoading) {
@@ -92,12 +128,60 @@ export const PatientTable: React.FC<Props> = ({
           <Table className="min-w-[850px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[200px]">Patient</TableHead>
-                <TableHead className="whitespace-nowrap">Demographics</TableHead>
+                <TableHead className="min-w-[200px]">
+                  <button
+                    type="button"
+                    onClick={handleToggleNameSort}
+                    className="inline-flex items-center gap-1.5 font-bold hover:text-foreground transition-colors cursor-pointer text-xs"
+                    title="Sort by patient name"
+                  >
+                    <span>Patient</span>
+                    {sort === "name_asc" ? (
+                      <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : sort === "name_desc" ? (
+                      <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 opacity-40 hover:opacity-100" />
+                    )}
+                  </button>
+                </TableHead>
+                <TableHead className="whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={handleToggleAgeSort}
+                    className="inline-flex items-center gap-1.5 font-bold hover:text-foreground transition-colors cursor-pointer text-xs"
+                    title="Sort by patient age"
+                  >
+                    <span>Demographics</span>
+                    {sort === "age_asc" ? (
+                      <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : sort === "age_desc" ? (
+                      <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 opacity-40 hover:opacity-100" />
+                    )}
+                  </button>
+                </TableHead>
                 <TableHead className="whitespace-nowrap">Condition</TableHead>
                 <TableHead className="min-w-[170px]">Attending Doctor</TableHead>
                 <TableHead className="whitespace-nowrap">Contact</TableHead>
-                <TableHead className="whitespace-nowrap">Visit Date</TableHead>
+                <TableHead className="whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={handleToggleDateSort}
+                    className="inline-flex items-center gap-1.5 font-bold hover:text-foreground transition-colors cursor-pointer text-xs"
+                    title="Sort by visit date"
+                  >
+                    <span>Visit Date</span>
+                    {sort === "newest" ? (
+                      <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                    ) : sort === "oldest" ? (
+                      <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 opacity-40 hover:opacity-100" />
+                    )}
+                  </button>
+                </TableHead>
                 <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -106,7 +190,7 @@ export const PatientTable: React.FC<Props> = ({
                 const docObj = typeof patient.doctor === "object" ? patient.doctor : null;
 
                 return (
-                  <TableRow key={patient._id} className="group">
+                  <TableRow key={patient._id} className="group hover:bg-muted/30 transition-colors">
                     <TableCell className="min-w-[200px]">
                       <div className="flex items-center gap-3">
                         {patient.image ? (
@@ -116,8 +200,8 @@ export const PatientTable: React.FC<Props> = ({
                             className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
                           />
                         ) : (
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                            {patient.name.charAt(0)}
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                            {(patient.name || "P").charAt(0)}
                           </div>
                         )}
                         <div className="min-w-0">
@@ -125,23 +209,38 @@ export const PatientTable: React.FC<Props> = ({
                             {patient.name}
                           </span>
                           {patient.email ? (
-                            <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(patient.email || "", "Email", `email-${patient._id}`)}
+                              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 truncate text-left cursor-pointer transition-colors group/mail"
+                              title="Click to copy email"
+                            >
                               <Mail className="h-3 w-3 shrink-0" />
                               <span className="truncate">{patient.email}</span>
-                            </span>
+                              {copiedId === `email-${patient._id}` ? (
+                                <Check className="h-2.5 w-2.5 text-emerald-500 shrink-0 ml-0.5" />
+                              ) : (
+                                <Copy className="h-2.5 w-2.5 opacity-0 group-hover/mail:opacity-100 shrink-0 ml-0.5 transition-opacity" />
+                              )}
+                            </button>
                           ) : (
-                            <span className="text-xs text-muted-foreground">No email</span>
+                            <span className="text-xs text-muted-foreground/60 italic">No email</span>
                           )}
                         </div>
                       </div>
                     </TableCell>
 
-                    <TableCell className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                      {patient.age} yrs • {patient.gender}
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                        <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span>{patient.age} yrs</span>
+                        <span className="text-border mx-0.5">•</span>
+                        <span className="text-muted-foreground font-normal">{patient.gender}</span>
+                      </div>
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap">
-                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-semibold whitespace-nowrap">
+                      <Badge variant={getConditionBadgeVariant(patient.condition)} className="font-medium">
                         {patient.condition}
                       </Badge>
                     </TableCell>
@@ -150,32 +249,43 @@ export const PatientTable: React.FC<Props> = ({
                       {docObj ? (
                         <Link
                           href={`/doctors/${docObj._id}`}
-                          className="group/doc inline-flex flex-col max-w-[180px]"
+                          className="flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-primary transition-colors group/doc"
                         >
-                          <span className="text-xs font-bold text-primary group-hover/doc:underline flex items-center gap-1 truncate">
-                            <Stethoscope className="h-3 w-3 text-primary shrink-0" />
-                            <span className="truncate">{docObj.name}</span>
-                          </span>
-                          <span className="text-[11px] text-muted-foreground truncate">
-                            {docObj.specialization}
-                          </span>
+                          <Stethoscope className="h-3.5 w-3.5 text-primary shrink-0 group-hover/doc:scale-110 transition-transform" />
+                          <span className="truncate max-w-[160px]">{docObj.name}</span>
                         </Link>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
-                          Assigned ({String(patient.doctor).substring(0, 6)}...)
-                        </span>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Stethoscope className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                          <span className="truncate max-w-[160px]">
+                            {typeof patient.doctor === "string" ? patient.doctor : "Unassigned"}
+                          </span>
+                        </div>
                       )}
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap">
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
-                        <Phone className="h-3 w-3 shrink-0" />
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(patient.phone, "Phone number", `phone-${patient._id}`)}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors group/ph whitespace-nowrap"
+                        title="Click to copy phone number"
+                      >
+                        <Phone className="h-3 w-3 shrink-0 group-hover/ph:text-primary transition-colors" />
                         <span className="font-mono whitespace-nowrap">{patient.phone}</span>
-                      </div>
+                        {copiedId === `phone-${patient._id}` ? (
+                          <Check className="h-2.5 w-2.5 text-emerald-500 shrink-0 ml-0.5" />
+                        ) : (
+                          <Copy className="h-2.5 w-2.5 opacity-0 group-hover/ph:opacity-100 shrink-0 ml-0.5 transition-opacity" />
+                        )}
+                      </button>
                     </TableCell>
 
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(patient.visitDate || patient.createdAt)}
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span>{formatDate(patient.visitDate || patient.createdAt)}</span>
+                      </div>
                     </TableCell>
 
                     <TableCell className="text-right whitespace-nowrap">
@@ -207,7 +317,7 @@ export const PatientTable: React.FC<Props> = ({
           </Table>
         </div>
 
-        {/* Mobile View */}
+        {/* Mobile Cards View */}
         <div className="grid grid-cols-1 gap-3 md:hidden">
           {patients.map((patient) => {
             const docObj = typeof patient.doctor === "object" ? patient.doctor : null;
@@ -226,14 +336,12 @@ export const PatientTable: React.FC<Props> = ({
                         className="h-10 w-10 shrink-0 rounded-xl object-cover border border-border/60"
                       />
                     ) : (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                        {patient.name.charAt(0)}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                        {(patient.name || "P").charAt(0)}
                       </div>
                     )}
                     <div>
-                      <span className="font-bold text-sm text-foreground block">
-                        {patient.name}
-                      </span>
+                      <p className="font-bold text-sm text-foreground">{patient.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {patient.age} yrs • {patient.gender}
                       </p>
@@ -244,29 +352,22 @@ export const PatientTable: React.FC<Props> = ({
                   </Badge>
                 </div>
 
-                <div className="text-xs text-muted-foreground space-y-1.5 pt-1 border-t border-border/40">
-                  {docObj && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Doctor:</span>
-                      <Link
-                        href={`/doctors/${docObj._id}`}
-                        className="font-semibold text-primary"
-                      >
-                        {docObj.name}
-                      </Link>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Phone:</span>
-                    <span className="text-foreground">{patient.phone}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Visit:</span>
-                    <span className="text-foreground">
-                      {formatDate(patient.visitDate || patient.createdAt)}
+                <div className="text-xs text-muted-foreground space-y-1 pt-1 border-t border-border/40">
+                  <div className="flex items-center gap-1.5">
+                    <Stethoscope className="h-3.5 w-3.5 text-primary" />
+                    <span>
+                      Attending: {docObj ? docObj.name : typeof patient.doctor === "string" ? patient.doctor : "None"}
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="h-3.5 w-3.5" />
+                      <span>{patient.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>{formatDate(patient.visitDate || patient.createdAt)}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -274,16 +375,16 @@ export const PatientTable: React.FC<Props> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 h-8 text-xs rounded-lg"
+                    className="h-8 px-2.5 rounded-lg text-xs"
                     onClick={() => onEdit(patient)}
                   >
                     <Pencil className="h-3.5 w-3.5 mr-1" />
-                    Edit Record
+                    Edit
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="h-8 px-3 rounded-lg text-xs"
+                    className="h-8 px-2.5 rounded-lg text-xs"
                     onClick={() => setSelectedPatientForDelete(patient)}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -299,8 +400,8 @@ export const PatientTable: React.FC<Props> = ({
         isOpen={!!selectedPatientForDelete}
         onClose={() => setSelectedPatientForDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title={`Delete patient ${selectedPatientForDelete?.name}?`}
-        description="Are you sure you want to permanently remove this patient record from the database?"
+        title={`Delete ${selectedPatientForDelete?.name}?`}
+        description="Are you sure you want to delete this patient record? This action cannot be undone."
         confirmText="Confirm Delete"
         isLoading={isDeleting}
       />

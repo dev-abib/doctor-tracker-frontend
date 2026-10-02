@@ -35,22 +35,22 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
       isLoading={isLoading}
       isEmpty={isEmpty}
     >
-      <div className="h-64 w-full">
+      <div className="h-64 w-full pt-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
             margin={{ top: 15, right: 15, left: -20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.2)" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.6} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               allowDecimals={false}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
               tickLine={false}
               axisLine={false}
             />
@@ -59,10 +59,10 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-lg text-xs">
-                      <p className="font-bold text-slate-900 dark:text-white">{item.fullName}</p>
-                      <p className="text-slate-400">{item.specialization}</p>
-                      <p className="mt-1 font-bold text-[#5046e5] dark:text-indigo-400">
+                    <div className="rounded-xl border border-border/80 bg-card/95 backdrop-blur-md p-2.5 shadow-xl text-xs space-y-1">
+                      <p className="font-bold text-foreground">{item.fullName}</p>
+                      <p className="text-muted-foreground">{item.specialization}</p>
+                      <p className="font-semibold text-primary">
                         {item.patients} Active Patients
                       </p>
                     </div>
@@ -74,10 +74,10 @@ export const PatientsPerDoctorChart: React.FC<Props> = ({ data = [], isLoading }
             <Line
               type="monotone"
               dataKey="patients"
-              stroke="#5046e5"
+              stroke="var(--primary)"
               strokeWidth={2.5}
-              dot={{ r: 4, fill: "#5046e5", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#5046e5", stroke: "var(--card)", strokeWidth: 2 }}
+              dot={{ r: 4, fill: "var(--primary)", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "var(--primary)", stroke: "var(--card)", strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>

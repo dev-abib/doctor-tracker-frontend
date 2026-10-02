@@ -18,6 +18,7 @@ export interface CreateDoctorPayload {
   hospital: string;
   phone: string;
   email: string;
+  image?: string;
 }
 
 export interface CreatePatientUnderDoctorPayload {
