@@ -63,9 +63,52 @@ flowchart TD
 ---
 
 ## 5. Visual Evidence
-- **Desktop Dashboard**: Complete KPI cards, Bar Charts, Area Charts, and Donut Charts.
-- **Desktop Doctor Directory**: Clean 2-tier search toolbar and responsive table with contact phone formatting.
-- **Mobile Responsive Views**: Touch-friendly slide-over drawer and card-based responsive tables without horizontal overflow.
+
+### 🖥️ Desktop Experience
+
+#### 1. Clinical Analytics Dashboard
+> Complete executive dashboard displaying real-time KPI metrics, patient volume time-series charts, doctor workload trends, and medical condition distributions.
+
+![Clinical Analytics Dashboard](public/Screenshots/Screenshot%20from%202026-10-02%2023-37-55.png)
+
+#### 2. Doctor Directory & 2-Tier Filter Toolbar
+> Comprehensive practitioner directory featuring multi-field search, specialty badges, affiliated hospitals, date filters, and action menus.
+
+![Doctor Directory](public/Screenshots/Screenshot%20from%202026-10-02%2023-38-03.png)
+
+#### 3. Patient Management & Clinical Registry
+> Centralized registry tracking patient demographics, active conditions, attending physicians, contact details, and visit timestamps.
+
+![Patient Management](public/Screenshots/Screenshot%20from%202026-10-02%2023-38-16.png)
+
+#### 4. Doctor Profile & Assigned Patient Roster
+> Physician profile header with credentials, hospital affiliations, direct contact channels, and dedicated assigned patient roster with inline removal.
+
+![Doctor Profile & Roster](public/Screenshots/Screenshot%20from%202026-10-02%2023-38-47.png)
+
+#### 5. Administrator Settings & Infrastructure Telemetry
+> Administrative profile settings, avatar management, TLS security status, and system architecture summary.
+
+![Administrator Settings](public/Screenshots/Screenshot%20from%202026-10-02%2023-38-23.png)
+
+#### 6. Secure Authentication Portal
+> Administrator login interface with quick credential loader, password reveal toggle, and validated form handling.
+
+![Authentication Portal](public/Screenshots/Screenshot%20from%202026-10-02%2023-37-15.png)
+
+---
+
+### 📱 Mobile Responsive Experience
+
+| Mobile Dashboard | Mobile Doctor Directory | Mobile Patient Registry |
+|:---:|:---:|:---:|
+| ![Mobile Dashboard](public/Screenshots/Screenshot%20from%202026-10-02%2023-43-32.png) | ![Mobile Doctors](public/Screenshots/Screenshot%20from%202026-10-02%2023-43-47.png) | ![Mobile Patients](public/Screenshots/Screenshot%20from%202026-10-02%2023-44-04.png) |
+| *Executive KPI Cards* | *Card-Based Doctor Records* | *Diagnosis Badges & Records* |
+
+| Mobile Doctor Detail | Mobile Settings & Tabs | Mobile Login Screen |
+|:---:|:---:|:---:|
+| ![Mobile Doctor Detail](public/Screenshots/Screenshot%20from%202026-10-02%2023-45-23.png) | ![Mobile Settings](public/Screenshots/Screenshot%20from%202026-10-02%2023-51-20.png) | ![Mobile Login](public/Screenshots/Screenshot%20from%202026-10-02%2023-40-35.png) |
+| *Roster Management & Actions* | *Responsive Segmented Tabs* | *Touch-Friendly Authentication* |
 
 ---
 
