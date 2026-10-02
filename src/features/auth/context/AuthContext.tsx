@@ -47,8 +47,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const data = await authApi.login(credentials);
       setUser(data.user);
-      if (typeof document !== "undefined" && data.token) {
-        document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+      if (typeof document !== "undefined") {
+        if (data.accessToken) {
+          document.cookie = `accessToken=${data.accessToken}; path=/; max-age=3600; SameSite=Lax`;
+        }
+        if (data.refreshToken) {
+          document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=2592000; SameSite=Lax`;
+        }
+        if (data.token) {
+          document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+        }
       }
       router.push("/");
     } finally {
@@ -63,6 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error("Logout error", e);
     } finally {
       if (typeof document !== "undefined") {
+        document.cookie = "accessToken=; path=/; max-age=0; SameSite=Lax";
+        document.cookie = "refreshToken=; path=/; max-age=0; SameSite=Lax";
         document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
       }
       setUser(null);

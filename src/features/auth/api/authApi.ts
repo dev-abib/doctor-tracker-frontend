@@ -8,6 +8,14 @@ export interface LoginCredentials {
 
 export interface AuthResponseData {
   user: User;
+  accessToken?: string;
+  refreshToken?: string;
+  token: string;
+}
+
+export interface RefreshResponseData {
+  accessToken: string;
+  refreshToken: string;
   token: string;
 }
 
@@ -29,6 +37,14 @@ export const authApi = {
     const res = await apiClient.post<ApiResponse<AuthResponseData>>(
       "/auth/login",
       credentials
+    );
+    return res.data.data!;
+  },
+
+  refreshToken: async (token?: string): Promise<RefreshResponseData> => {
+    const res = await apiClient.post<ApiResponse<RefreshResponseData>>(
+      "/auth/refresh-token",
+      token ? { refreshToken: token } : {}
     );
     return res.data.data!;
   },
