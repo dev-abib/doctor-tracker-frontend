@@ -121,15 +121,6 @@ export const LoginForm: React.FC = () => {
               )}
             </div>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end pt-1">
-              <button
-                type="button"
-                className="text-xs font-semibold text-primary hover:underline transition-all cursor-pointer"
-              >
-                Forgot password?
-              </button>
-            </div>
 
             {/* Sign In Button */}
             <button

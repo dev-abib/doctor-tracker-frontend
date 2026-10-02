@@ -15,7 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { cn, SWAGGER_DOCS_URL } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   isOpen: boolean; // Mobile drawer state
@@ -207,7 +207,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <nav className="space-y-1">
                 <a
-                  href={SWAGGER_DOCS_URL}
+                  href="http://localhost:5000/api/docs"
                   target="_blank"
                   rel="noopener noreferrer"
                   title={isCollapsed ? "Swagger API Docs" : undefined}

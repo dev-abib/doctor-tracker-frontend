@@ -69,6 +69,15 @@ flowchart TD
 
 ---
 
-## 6. Credentials
+## 6. Live Deployments & Credentials
+
+### Live Links
+- **Production Dashboard**: [https://doctor-tracker-frontend-drab.vercel.app](https://doctor-tracker-frontend-drab.vercel.app)
+- **Production Backend API**: [https://doctor-tracker-server-pearl.vercel.app/api/v1](https://doctor-tracker-server-pearl.vercel.app/api/v1)
+- **Interactive Swagger Docs**: [https://doctor-tracker-server-pearl.vercel.app/api/docs](https://doctor-tracker-server-pearl.vercel.app/api/docs)
+- **GitHub Repository**: [https://github.com/dev-abib/doctor-tracker-frontend](https://github.com/dev-abib/doctor-tracker-frontend)
+
+### Administrator Credentials
 - **Admin Email**: `admin@doctortracker.com`
-- **Password**: `admin123456`
+- **Password**: `Admin@123456`
+- *(A "Load Demo Admin Credentials" button is also provided directly on the login form)*

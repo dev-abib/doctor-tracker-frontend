@@ -19,7 +19,6 @@ import {
 import { ThemeToggle } from "./ThemeToggle";
 import { QuickSearchModal } from "./QuickSearchModal";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { SWAGGER_DOCS_URL } from "@/lib/utils";
 
 interface TopbarProps {
   onToggleMobileSidebar: () => void;
@@ -190,7 +189,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
           {/* Swagger API & Handoff Link */}
           <a
-            href={SWAGGER_DOCS_URL}
+            href="http://localhost:5000/api/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:inline-flex items-center gap-1.5 rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 border border-primary/20 transition-colors shrink-0 whitespace-nowrap"

@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { useDoctorsList } from "@/features/doctors/hooks/useDoctors";
 import { usePatientsList } from "@/features/patients/hooks/usePatients";
-import { SWAGGER_DOCS_URL } from "@/lib/utils";
 
 interface QuickSearchModalProps {
   isOpen: boolean;
@@ -325,7 +324,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                 })}
 
                 <a
-                  href={SWAGGER_DOCS_URL}
+                  href="http://localhost:5000/api/docs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-between p-2.5 rounded-xl hover:bg-[#eff2fc] dark:hover:bg-slate-800 transition-colors text-left group cursor-pointer"
